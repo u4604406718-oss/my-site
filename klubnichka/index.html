@@ -1,0 +1,599 @@
+<title>Клубничка Улан-Удэ</title>
+<meta name="description" content="Блинная-кондитерская «Клубничка» в Улан-Удэ: торты по домашним рецептам с 2013 года, блины и завтраки. Ленина, 18 и Смолина, 81.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=Marck+Script&display=swap">
+<style>
+  :root {
+    --berry: #d4213d;
+    --berry-deep: #a8122b;
+    --choco: #3a1d17;
+    --choco-soft: #6b4238;
+    --blush: #fdf0f1;
+    --blush-2: #f8dfe2;
+    --paper: #ffffff;
+    --leaf: #3d7a4a;
+    --sponge: #e9b877;
+    --sponge-dark: #7a4a2c;
+    --cream: #fffaf5;
+    --line: #efd3d7;
+    --shadow: 0 18px 40px -22px rgba(58, 29, 23, .45);
+    --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+    --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+    --script: "Marck Script", "Brush Script MT", cursive;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--blush);
+    color: var(--choco);
+    font: 16px/1.6 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
+  :focus-visible { outline: 3px solid var(--berry); outline-offset: 3px; border-radius: 6px; }
+
+  .wrap { width: 100%; max-width: 1160px; margin-inline: auto; padding-inline: 20px; }
+  section[id] { scroll-margin-top: 84px; }
+
+  /* ---------- header ---------- */
+  .top {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top .wrap { display: flex; align-items: center; gap: 24px; min-height: 68px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand b { font: 400 30px/1 var(--script); color: var(--berry); }
+  .brand small { font-size: 11px; line-height: 1.2; color: var(--choco-soft); max-width: 120px; }
+  .nav { display: flex; gap: 22px; margin-left: auto; font-weight: 600; font-size: 15px; }
+  .nav a { text-decoration: none; padding-block: 6px; border-bottom: 2px solid transparent; }
+  .nav a:hover { border-color: var(--berry); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: 700 15px/1 var(--body); text-decoration: none; cursor: pointer;
+    padding: 14px 22px; border-radius: 999px; border: 0;
+    background: var(--berry); color: #fff;
+    transition: transform .15s, background .15s;
+  }
+  .btn:hover { background: var(--berry-deep); transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--choco); box-shadow: inset 0 0 0 2px var(--choco); }
+  .btn.ghost:hover { background: var(--choco); color: #fff; }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+
+  /* ---------- hero ---------- */
+  .hero { padding-block: 56px 40px; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .promo {
+    display: inline-flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    background: var(--paper); border: 1px dashed var(--berry);
+    padding: 8px 14px; border-radius: 12px; font-size: 14px; font-weight: 600;
+  }
+  .promo code { font: 700 13px var(--body); background: var(--berry); color: #fff; padding: 3px 8px; border-radius: 6px; }
+  h1 {
+    font: 800 clamp(34px, 5.4vw, 64px)/1.02 var(--display);
+    letter-spacing: -.02em; margin: 22px 0 18px; text-wrap: balance;
+  }
+  h1 em { font: 400 1.15em/1 var(--script); color: var(--berry); letter-spacing: 0; }
+  .lead { font-size: 18px; max-width: 34em; color: var(--choco-soft); margin: 0 0 28px; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .facts { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 34px; font-size: 14px; }
+  .facts b { display: block; font: 700 22px/1.1 var(--display); color: var(--berry); }
+
+  /* the animated cake */
+  .stage { position: relative; height: 420px; display: grid; place-items: end center; }
+  .stage::before {
+    content: ""; position: absolute; inset: 20px 0 0; border-radius: 50%;
+    background: radial-gradient(circle at 50% 55%, #fff 0 45%, transparent 70%);
+  }
+  .cake { position: relative; width: 300px; margin-bottom: 30px; }
+  .plate {
+    position: absolute; left: -40px; right: -40px; bottom: -24px; height: 50px; border-radius: 50%;
+    background: linear-gradient(#f3d38a, #c99a3e); box-shadow: 0 16px 24px -12px rgba(58,29,23,.4);
+  }
+  .tier { position: relative; height: 46px; border-radius: 10px; }
+  .tier.sp { background: linear-gradient(180deg, #f2c98d, var(--sponge)); }
+  .tier.sp.dk { background: linear-gradient(180deg, #8b5634, var(--sponge-dark)); }
+  .tier.cr { height: 18px; background: var(--cream); margin-inline: 4px; border-radius: 8px; }
+  .tier.cr.pink { background: #f7c3cc; }
+  .frost {
+    position: relative; height: 34px; border-radius: 16px 16px 6px 6px;
+    background: var(--cream); box-shadow: inset 0 -6px 0 rgba(0,0,0,.04);
+  }
+  .drip { position: absolute; top: 20px; width: 18px; border-radius: 0 0 10px 10px; background: var(--cream); }
+  .berries { position: absolute; left: 0; right: 0; top: -44px; display: flex; justify-content: center; gap: 4px; }
+  .sb {
+    --s: 44px; width: var(--s); height: calc(var(--s) * 1.12); position: relative;
+    border-radius: 48% 48% 50% 50% / 38% 38% 62% 62%;
+    background:
+      radial-gradient(circle, #ffe08a 0 1.4px, transparent 2px) 0 0 / 9px 9px,
+      radial-gradient(circle at 35% 30%, #ff6b7d, var(--berry) 55%, var(--berry-deep));
+    transform: rotate(180deg);
+  }
+  .sb::after {
+    content: ""; position: absolute; left: 18%; right: 18%; bottom: -6%; height: 28%;
+    background: var(--leaf); border-radius: 50% 50% 40% 40%;
+    clip-path: polygon(0 60%, 15% 0, 30% 55%, 50% 0, 70% 55%, 85% 0, 100% 60%, 50% 100%);
+  }
+  .sb.s2 { --s: 52px; transform: rotate(170deg) translateY(4px); }
+  .sb.s3 { transform: rotate(195deg); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cake .tier, .cake .frost { animation: drop .55s cubic-bezier(.3, 1.4, .5, 1) both; }
+    .cake > :nth-child(2) { animation-delay: 1.00s; }
+    .cake > :nth-child(3) { animation-delay: .85s; }
+    .cake > :nth-child(4) { animation-delay: .70s; }
+    .cake > :nth-child(5) { animation-delay: .55s; }
+    .cake > :nth-child(6) { animation-delay: .40s; }
+    .cake > :nth-child(7) { animation-delay: .25s; }
+    .drip { animation: grow .7s 1.5s ease-out both; }
+    .berries .sb { animation: berry .6s cubic-bezier(.3, 1.6, .5, 1) both; }
+    .berries .sb:nth-child(1) { animation-delay: 1.7s; }
+    .berries .sb:nth-child(2) { animation-delay: 1.85s; }
+    .berries .sb:nth-child(3) { animation-delay: 2.0s; }
+    .float { animation: float 7s ease-in-out infinite; }
+    .reveal { animation: rise .8s ease-out both; }
+    .reveal.d1 { animation-delay: .1s; } .reveal.d2 { animation-delay: .2s; } .reveal.d3 { animation-delay: .3s; }
+  }
+  @keyframes drop { from { transform: translateY(-260px); opacity: 0; } 60% { opacity: 1; } }
+  @keyframes grow { from { transform: scaleY(0); transform-origin: top; } }
+  @keyframes berry { from { transform: translateY(-160px) rotate(120deg); opacity: 0; } }
+  @keyframes rise { from { transform: translateY(18px); opacity: .01; } }
+  @keyframes float { 50% { transform: translateY(-14px) rotate(8deg); } }
+  .float { position: absolute; }
+  .float.f1 { left: 4%; top: 18%; } .float.f2 { right: 6%; top: 8%; animation-delay: -3s; }
+  .float .sb { --s: 26px; opacity: .9; }
+
+  /* ---------- moved banner ---------- */
+  .moved { background: var(--choco); color: #fff; }
+  .moved .wrap { display: flex; gap: 18px 36px; flex-wrap: wrap; align-items: center; padding-block: 18px; font-size: 15px; }
+  .moved strong { font: 700 15px var(--display); color: #ffb3bf; }
+  .moved s { opacity: .6; }
+
+  /* ---------- sections ---------- */
+  .sec { padding-block: 84px; }
+  .sec.white { background: var(--paper); }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--berry); }
+  h2 { font: 800 clamp(28px, 3.6vw, 44px)/1.08 var(--display); letter-spacing: -.02em; margin: 10px 0 14px; text-wrap: balance; }
+  .sub { color: var(--choco-soft); max-width: 40em; margin: 0 0 40px; }
+
+  /* cakes */
+  .cakes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { background: var(--paper); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); transition: transform .2s; }
+  .card:hover { transform: translateY(-4px); }
+  .card .pic { position: relative; aspect-ratio: 4 / 3; background: radial-gradient(circle at 50% 45%, #fff, var(--blush-2)); display: grid; place-items: center; }
+  .tag { position: absolute; top: 14px; left: 14px; background: var(--berry); color: #fff; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px; }
+  .card .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card h3 { font: 700 20px/1.2 var(--display); margin: 0; }
+  .card p { margin: 0; color: var(--choco-soft); font-size: 15px; flex: 1; }
+  .card .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+  .price { font: 800 22px var(--display); font-variant-numeric: tabular-nums; }
+  .card .btn { padding: 11px 18px; font-size: 14px; }
+
+  /* mini drawn cakes for cards */
+  .mini { position: relative; width: 58%; }
+  .mini .t { height: 70px; border-radius: 50% / 22px; position: relative; }
+  .mini .s { height: 62px; margin-top: -34px; border-radius: 0 0 50% 50% / 0 0 22px 22px; }
+  .mini .p { position: absolute; left: -12%; right: -12%; bottom: -12px; height: 34px; border-radius: 50%; background: linear-gradient(#f3d38a, #c99a3e); z-index: -1; }
+  .crumb-red { background: radial-gradient(circle, #ff8a9a 0 1.5px, transparent 2.2px) 0 0 / 7px 7px, radial-gradient(circle, #8e0f22 0 1.5px, transparent 2.2px) 3px 4px / 8px 8px, #c8203a; }
+  .crumb-sand { background: radial-gradient(circle, #fff3dc 0 1.6px, transparent 2.3px) 0 0 / 7px 7px, radial-gradient(circle, #a8733f 0 1.5px, transparent 2.2px) 3px 3px / 8px 8px, #d9ae78; }
+  .choco-top { background: radial-gradient(circle, #3a1d17 0 1.8px, transparent 2.4px) 0 0 / 8px 8px, radial-gradient(circle, #6b4238 0 1.6px, transparent 2.2px) 4px 4px / 9px 9px, #f7ede4; }
+  .zebra { background: linear-gradient(180deg, #7a4a2c 0 22%, #fffaf5 22% 34%, #e9b877 34% 56%, #fffaf5 56% 68%, #7a4a2c 68% 100%); }
+
+  /* order steps */
+  .order { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 48px 1fr; gap: 14px; align-items: start; background: var(--blush); border-radius: 16px; padding: 16px; }
+  .steps li::before { content: counter(s); font: 800 20px/48px var(--display); text-align: center; background: var(--paper); color: var(--berry); border-radius: 50%; width: 48px; height: 48px; }
+  .steps b { display: block; font-size: 17px; }
+  .steps span { color: var(--choco-soft); font-size: 15px; }
+  form.req { background: var(--choco); color: #fff; border-radius: 24px; padding: 28px; display: grid; gap: 16px; }
+  form.req h3 { font: 700 22px var(--display); margin: 0; }
+  form.req label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+  form.req input, form.req textarea, form.req select {
+    font: 500 16px var(--body); padding: 12px 14px; border-radius: 12px; border: 0; background: #fff; color: var(--choco); width: 100%;
+  }
+  form.req .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  form.req .hint { font-size: 13px; opacity: .75; margin: 0; }
+
+  .gallery { display: flex; gap: 14px; overflow-x: auto; padding-block: 36px 6px; scroll-snap-type: x mandatory; }
+  .gallery figure { margin: 0; flex: 0 0 220px; aspect-ratio: 3 / 4; border-radius: 18px; overflow: hidden; scroll-snap-align: start; position: relative;
+    background: radial-gradient(circle at 50% 40%, #fff, var(--blush-2)); display: grid; place-items: center; }
+  .gallery figure img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .gallery figure .ph { font-size: 13px; color: var(--choco-soft); text-align: center; padding: 12px; display: grid; gap: 10px; justify-items: center; }
+  .gallery .sb { --s: 34px; }
+
+  /* menu */
+  .tabs { display: inline-flex; background: var(--paper); border-radius: 999px; padding: 5px; gap: 4px; margin-bottom: 28px; }
+  .tabs button { font: 700 15px var(--body); border: 0; background: transparent; color: var(--choco); padding: 10px 20px; border-radius: 999px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--berry); color: #fff; }
+  .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 48px; }
+  .item { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+  .item b { font-size: 17px; }
+  .item i { font-style: normal; font-weight: 800; font-family: var(--display); font-size: 17px; font-variant-numeric: tabular-nums; }
+  .item span { grid-column: 1 / -1; color: var(--choco-soft); font-size: 14px; }
+  .note { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chip { background: var(--paper); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 600; }
+
+  .breakfasts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .bf { background: var(--blush); border-radius: 20px; padding: 22px; display: grid; gap: 8px; align-content: start; }
+  .bf .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .bf h3 { font: 700 18px var(--display); margin: 0; }
+  .bf p { margin: 0; color: var(--choco-soft); font-size: 15px; }
+
+  /* new items */
+  .news { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .nw { border-radius: 22px; padding: 26px; color: #fff; display: grid; gap: 12px; align-content: start; }
+  .nw.a { background: linear-gradient(160deg, #5a2a22, #2b1410); }
+  .nw.b { background: linear-gradient(160deg, #e0892a, #c2451e); }
+  .nw.c { background: linear-gradient(160deg, #d4213d, #8e1027); }
+  .nw h3 { font: 800 22px/1.15 var(--display); margin: 0; }
+  .nw p { margin: 0; opacity: .9; font-size: 15px; }
+  .nw ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 15px; }
+  .nw li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid rgba(255,255,255,.2); padding-bottom: 6px; }
+  .nw li b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* delivery */
+  .deliv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .dv { background: var(--paper); border-radius: 20px; padding: 22px; }
+  .dv b { display: block; font: 800 26px/1.1 var(--display); color: var(--berry); margin-bottom: 6px; }
+  .dv span { font-size: 15px; color: var(--choco-soft); }
+
+  /* contacts */
+  footer { background: var(--choco); color: #fff; padding-block: 64px 110px; }
+  .places { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .place h3 { font: 700 20px var(--display); margin: 0 0 8px; }
+  .place p { margin: 0 0 4px; opacity: .85; }
+  .place a { color: #ffb3bf; font-weight: 700; }
+  .phone { font: 700 20px var(--display); font-variant-numeric: tabular-nums; user-select: all; }
+  .copy { margin-top: 42px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.15); font-size: 13px; opacity: .65; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  .mbar { display: none; }
+
+  @media (max-width: 960px) {
+    .nav { display: none; }
+    .top .btn { margin-left: auto; }
+    .hero .wrap, .order { grid-template-columns: 1fr; }
+    .stage { height: 340px; order: -1; }
+    .cake { transform: scale(.85); transform-origin: bottom center; }
+    .cakes, .news, .breakfasts { grid-template-columns: 1fr 1fr; }
+    .deliv { grid-template-columns: 1fr 1fr; }
+    .places { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 620px) {
+    .wrap { padding-inline: 16px; }
+    .hero { padding-block: 24px 36px; }
+    .top .btn { display: none; }
+    .brand small { display: none; }
+    .cakes, .news, .breakfasts, .menu, form.req .two { grid-template-columns: 1fr; }
+    .sec { padding-block: 60px; }
+    .mbar {
+      display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; gap: 10px;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255,255,255,.95); border-top: 1px solid var(--line); backdrop-filter: blur(10px);
+    }
+    .mbar .btn { flex: 1; padding: 13px 10px; }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Клубничка, на главную">
+      <b>Клубничка</b>
+      <small>блинная-кондитерская с 2013 года</small>
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#cakes">Торты</a>
+      <a href="#custom">На заказ</a>
+      <a href="#menu">Блины и завтраки</a>
+      <a href="#delivery">Доставка</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт.">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.6-.1l2 .9c.2.1.4.2.5.3 0 .2 0 .7-.1 1.1Z"/></svg>
+      Написать в WhatsApp
+    </a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="promo reveal">Пн и Вт скидка 15% на торты <code>Пятнашка в деле</code></div>
+        <h1 class="reveal d1">Торты по <em>домашним</em> рецептам в Улан-Удэ</h1>
+        <p class="lead reveal d2">Печём каждый день с 2013 года из продуктов местных производителей. Готовые торты ждут вас в кафе, а на праздник сделаем торт с вашим дизайном.</p>
+        <div class="cta reveal d3">
+          <a class="btn" href="#cakes">Выбрать торт</a>
+          <a class="btn ghost" href="#custom">Торт на заказ</a>
+        </div>
+        <div class="facts">
+          <div><b>13 лет</b>печём торты</div>
+          <div><b>250 ₽</b>доставка по городу</div>
+          <div><b>9:00–20:00</b>каждый день</div>
+        </div>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <div class="float f1"><div class="sb"></div></div>
+        <div class="float f2"><div class="sb s3"></div></div>
+        <div class="cake">
+          <div class="plate"></div>
+          <div class="tier sp dk"></div>
+          <div class="tier cr"></div>
+          <div class="tier sp"></div>
+          <div class="tier cr pink"></div>
+          <div class="tier sp dk"></div>
+          <div class="frost">
+            <span class="drip" style="left:8%;height:26px"></span>
+            <span class="drip" style="left:26%;height:40px"></span>
+            <span class="drip" style="left:47%;height:22px"></span>
+            <span class="drip" style="left:66%;height:36px"></span>
+            <span class="drip" style="left:84%;height:28px"></span>
+            <div class="berries"><div class="sb"></div><div class="sb s2"></div><div class="sb s3"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="moved">
+    <div class="wrap">
+      <strong>Мы переехали</strong>
+      <span>Кафе: <b>Ленина, 18</b></span>
+      <span>Новый филиал: <b>Смолина, 81</b></span>
+      <span><s>Каландаришвили, 25</s> больше не работает</span>
+    </div>
+  </div>
+
+  <section class="sec" id="cakes">
+    <div class="wrap">
+      <div class="eyebrow">Торты в наличии</div>
+      <h2>Забирайте сегодня</h2>
+      <p class="sub">Эти торты всегда есть в кафе на Ленина, 18 и Смолина, 81. Можно забрать самим или заказать доставку домой и на работу.</p>
+      <div class="cakes">
+        <article class="card">
+          <div class="pic"><span class="tag">Хит продаж</span>
+            <div class="mini"><div class="t choco-top"></div><div class="s zebra"></div><div class="p"></div></div>
+          </div>
+          <div class="body">
+            <h3>Шоколадно-банановый</h3>
+            <p>Двухцветный бисквит «зебра» с банановой прослойкой, сметанный крем и шоколадная крошка.</p>
+            <div class="row"><span class="price">1 200 ₽</span><a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Шоколадно-банановый».">Заказать</a></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="pic"><span class="tag">Хит продаж</span>
+            <div class="mini"><div class="t crumb-red"></div><div class="s crumb-red"></div><div class="p"></div></div>
+          </div>
+          <div class="body">
+            <h3>Искушение</h3>
+            <p>Бисквит «красный бархат» и крем-чиз.</p>
+            <div class="row"><span class="price">1 400 ₽</span><a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Искушение».">Заказать</a></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="pic"><span class="tag">Сама нежность</span>
+            <div class="mini"><div class="t crumb-sand"></div><div class="s crumb-sand"></div><div class="p"></div></div>
+          </div>
+          <div class="body">
+            <h3>Молочная девочка</h3>
+            <p>Нежный бисквит на сгущённом молоке, прослойка крем-чиз и песочная крошка.</p>
+            <div class="row"><span class="price">1 400 ₽</span><a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Молочная девочка».">Заказать</a></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec white" id="custom">
+    <div class="wrap">
+      <div class="eyebrow">Торты на заказ</div>
+      <h2>Торт для вашего праздника</h2>
+      <p class="sub">Свадьба, день рождения, выпускной. Кондитеры сделают торт с вашим оформлением, каждый получается единственным в своём роде. От 3 000 ₽ за кг.</p>
+      <div class="order">
+        <ol class="steps">
+          <li><div><b>Дата и гости</b><span>Выберите день праздника и прикиньте, сколько будет гостей.</span></div></li>
+          <li><div><b>Бисквит и крем</b><span>Подберите начинку, подскажем, что сочетается лучше.</span></div></li>
+          <li><div><b>Заявка</b><span>Отправьте форму, менеджер ответит и уточнит дизайн.</span></div></li>
+          <li><div><b>Праздник</b><span>Заберите торт в назначенный день или закажите доставку.</span></div></li>
+        </ol>
+        <form class="req" id="req">
+          <h3>Заявка на торт</h3>
+          <div class="two">
+            <label for="f-date">Дата праздника<input id="f-date" type="date" required></label>
+            <label for="f-guests">Гостей<input id="f-guests" type="number" min="1" placeholder="например, 12"></label>
+          </div>
+          <label for="f-event">Повод
+            <select id="f-event"><option>День рождения</option><option>Свадьба</option><option>Выпускной</option><option>Детский праздник</option><option>Другое</option></select>
+          </label>
+          <label for="f-wish">Пожелания к дизайну<textarea id="f-wish" rows="3" placeholder="Цвета, надпись, фигурки"></textarea></label>
+          <button class="btn" type="submit">Отправить в WhatsApp</button>
+          <p class="hint">Откроется WhatsApp с готовым сообщением, останется нажать «Отправить».</p>
+        </form>
+      </div>
+      <div class="gallery" id="gallery" aria-label="Примеры тортов на заказ"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="new">
+    <div class="wrap">
+      <div class="eyebrow">Новинки</div>
+      <h2>Попробуйте этим летом</h2>
+      <div class="news">
+        <div class="nw a">
+          <h3>Корпусные пирожные</h3>
+          <p>Тонкая шоколадная оболочка хрустит, а внутри нежная тающая начинка. Тот самый десерт из интернета.</p>
+          <ul><li>Пирожное <b>350 ₽/шт</b></li></ul>
+        </div>
+        <div class="nw b">
+          <h3>Лимонады</h3>
+          <p>Натуральные, готовим на Ленина, 18.</p>
+          <ul>
+            <li>Груша, Клубника-лайм <b>260 / 650 ₽</b></li>
+            <li>Манго-маракуйя <b>260 / 650 ₽</b></li>
+            <li>Малина-маракуйя, Мохито <b>260 / 650 ₽</b></li>
+          </ul>
+          <p style="font-size:13px">330 мл / 1 л</p>
+        </div>
+        <div class="nw c">
+          <h3>Бельгийские вафли</h3>
+          <p>Хрустящие снаружи, мягкие внутри.</p>
+          <ul>
+            <li>С мороженым <b>350 ₽</b></li>
+            <li>С бананом <b>350 ₽</b></li>
+            <li>С шоколадом и клубникой <b>370 ₽</b></li>
+            <li>Клубника в шоколаде <b>380 ₽</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec white" id="menu">
+    <div class="wrap">
+      <div class="eyebrow">Кафе на Ленина, 18</div>
+      <h2>Блины при вас и завтраки</h2>
+      <div class="note"><span class="chip">Блины 9:00–20:00</span><span class="chip">Завтраки 9:00–11:00</span><span class="chip">Только в кафе</span></div>
+
+      <div class="breakfasts" style="margin-bottom:48px">
+        <div class="bf"><div class="row"><h3>Завтрак 1</h3><span class="price">250 ₽</span></div><p>Глазунья, сосиска на гриле, тост, огурцы, помидоры, сливочное масло</p></div>
+        <div class="bf"><div class="row"><h3>Завтрак 2</h3><span class="price">250 ₽</span></div><p>Омлет с курицей, ветчиной или фаршем, огурцы, помидоры, тост, масло</p></div>
+        <div class="bf"><div class="row"><h3>Завтрак 3</h3><span class="price">250 ₽</span></div><p>Глазунья, сосиска, салат, шампиньоны, тост, сливочное масло</p></div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Блины">
+        <button role="tab" id="t-hearty" aria-selected="true" aria-controls="m-hearty">Сытные</button>
+        <button role="tab" id="t-sweet" aria-selected="false" aria-controls="m-sweet">Сладкие</button>
+      </div>
+      <div class="menu" id="m-hearty" role="tabpanel" aria-labelledby="t-hearty"></div>
+      <div class="menu" id="m-sweet" role="tabpanel" aria-labelledby="t-sweet" hidden></div>
+    </div>
+  </section>
+
+  <section class="sec" id="delivery">
+    <div class="wrap">
+      <div class="eyebrow">Доставка</div>
+      <h2>Привезём торт домой или на работу</h2>
+      <p class="sub">Доставляем торты из каталога в стандартном оформлении. Блины и завтраки только в кафе.</p>
+      <div class="deliv">
+        <div class="dv"><b>250 ₽</b><span>по городу, при любой сумме заказа</span></div>
+        <div class="dv"><b>10–18</b><span>часы доставки</span></div>
+        <div class="dv"><b>Кроме ср</b><span>доставка работает 6 дней в неделю</span></div>
+        <div class="dv"><b>0 ₽</b><span>самовывоз с Ленина, 18 или Смолина, 81</span></div>
+      </div>
+      <p class="sub" style="margin-top:24px">В отдалённые районы стоимость уточняйте по телефону.</p>
+    </div>
+  </section>
+</main>
+
+<footer id="contacts">
+  <div class="wrap">
+    <h2 style="margin-top:0">Приходите в гости</h2>
+    <div class="places">
+      <div class="place">
+        <h3>Ленина, 18</h3>
+        <p>Кафе: торты, блины, завтраки, лимонады</p>
+        <p class="phone">+7 950 385-19-88</p>
+        <p><a href="https://2gis.ru/ulanude/search/%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%D0%B0%2018" target="_blank" rel="noopener">Открыть в 2ГИС</a></p>
+      </div>
+      <div class="place">
+        <h3>Смолина, 81</h3>
+        <p>Новый филиал: торты в наличии</p>
+        <p class="phone">+7 924 777-24-47</p>
+        <p><a href="https://2gis.ru/ulanude/search/%D0%A1%D0%BC%D0%BE%D0%BB%D0%B8%D0%BD%D0%B0%2081" target="_blank" rel="noopener">Открыть в 2ГИС</a></p>
+      </div>
+      <div class="place">
+        <h3>Каждый день 9:00–20:00</h3>
+        <p><a href="https://vk.com/tortynazakazulanude" target="_blank" rel="noopener">ВКонтакте</a></p>
+        <p><a href="https://instagram.com/tort_klubnichka" target="_blank" rel="noopener">Instagram</a></p>
+      </div>
+    </div>
+    <div class="copy"><span>© 2013–2026 Блинная-кондитерская «Клубничка», Улан-Удэ</span><span>Концепт нового сайта</span></div>
+  </div>
+</footer>
+
+<div class="mbar">
+  <a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт.">WhatsApp</a>
+  <a class="btn ghost" href="#cakes">Торты</a>
+</div>
+
+<script>
+  const WA = "79503851988";
+  const waLink = msg => "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+  document.querySelectorAll("a.wa").forEach(a => {
+    a.href = waLink(a.dataset.msg);
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
+
+  document.getElementById("req").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = id => document.getElementById(id).value.trim();
+    const lines = ["Здравствуйте! Хочу заказать торт.", "Повод: " + v("f-event"), "Дата: " + v("f-date")];
+    if (v("f-guests")) lines.push("Гостей: " + v("f-guests"));
+    if (v("f-wish")) lines.push("Пожелания: " + v("f-wish"));
+    window.open(waLink(lines.join("\n")), "_blank", "noopener");
+  });
+
+  const hearty = [
+    ["Блин", "", 105], ["Блин с маслом и сметаной", "", 125],
+    ["Студенческий", "сосиска, салат, капуста, лук, томатный соус, зелень", 190],
+    ["Сырный", "сыр, зелень", 175],
+    ["Пикантный", "горбуша, картофель в сливочном соусе, зелень", 205],
+    ["Сытный", "сыр, ветчина, помидор, чесночный соус", 220],
+    ["Нежность", "курица, грибы, лук, зелень, сметанный соус", 220],
+    ["Цезарь", "курица, помидор, огурец, сыр, чесночный соус", 220],
+    ["Арбатский", "бекон, сыр, яйцо, зелень, чесночный соус", 210],
+    ["Королевский", "сёмга, свежий огурец, сливочный соус, зелень", 350],
+    ["Вегетарианский", "сыр, помидор, свежий огурец, сливочный соус", 200],
+    ["Мясной", "фарш, лук, специи, сливочный соус, зелень", 220]
+  ];
+  const sweet = [
+    ["Шоко-моко", "шоколадная паста, банан, грецкий орех, шоколадный сироп", 205],
+    ["Клубника в облаках", "клубника, сметана, творог, клубничный сироп", 205],
+    ["Нежный персик", "персик, творог, сметана, карамельный сироп", 205],
+    ["Лакомка", "сгущёнка, грецкий орех", 190],
+    ["Яблоко или груша в карамели", "печёные фрукты в карамели, сироп", 200],
+    ["Творожно-банановый", "творог, сметана, банан, карамельный сироп", 210],
+    ["Сластёна", "варёная сгущёнка, банан, карамельный сироп", 205],
+    ["Клубника со сливками", "клубника, взбитые сливки, сироп", 230],
+    ["С вареньем, сгущёнкой, мёдом или шоколадной пастой", "", 140],
+    ["Тропический", "шоколадная паста, банан, киви, шоколадный топпинг", 220],
+    ["Творожно-шоколадный", "шоколадная паста, творог, шоколадный топпинг", 210],
+    ["Экзотический", "банан, киви, апельсин, карамельный топпинг", 210]
+  ];
+  const fill = (id, rows) => {
+    document.getElementById(id).innerHTML = rows.map(([n, d, p]) =>
+      `<div class="item"><b>${n}</b><i>${p} ₽</i>${d ? `<span>${d}</span>` : ""}</div>`).join("");
+  };
+  fill("m-hearty", hearty);
+  fill("m-sweet", sweet);
+  document.querySelectorAll('[role="tab"]').forEach(tab => tab.addEventListener("click", () => {
+    document.querySelectorAll('[role="tab"]').forEach(t => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", on);
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  }));
+
+  // Фото тортов с текущего сайта. Если картинка не загрузилась, остаётся рисованная заглушка.
+  const photos = [
+    "tild3430-3239-4436-b265-393937386532/-/empty/f2476383-31ec-42c1-b.jpg",
+    "tild6430-3239-4064-b333-353065366131/-/empty/e6d24905-36ab-4fe2-a.jpg",
+    "tild3561-3730-4537-b437-656137663263/-/empty/47c90cf9-39c3-48b7-b.jpg",
+    "tild6531-3439-4839-a563-323239653261/-/empty/db712bad-09a7-44fb-8.jpg",
+    "tild6165-6666-4665-a466-396261613936/-/empty/e50f209b-a287-41e1-a.jpg",
+    "tild6362-3832-4735-a330-383131646632/-/empty/288f2a55-dfac-4f7d-b.jpg",
+    "tild6537-3533-4665-b466-623031343230/-/empty/9ccddf01-fbc6-4e36-8.jpg",
+    "tild3333-3131-4531-b038-333132323362/-/empty/e0f627da-e38f-43e0-b.jpg",
+    "tild3536-6431-4262-b962-626465313562/-/empty/ba5eb265-f597-49b5-9.jpg",
+    "tild3563-6565-4431-a664-323161346164/-/empty/18c1735e-396d-4501-8.jpg"
+  ];
+  document.getElementById("gallery").innerHTML = photos.map(p =>
+    `<figure><div class="ph"><div class="sb"></div>Фото торта</div>` +
+    `<img src="https://thb.tildacdn.com/${p}" alt="Торт на заказ от «Клубнички»" loading="lazy" onerror="this.remove()"></figure>`).join("");
+</script>
