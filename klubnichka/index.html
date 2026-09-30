@@ -2,260 +2,271 @@
 <meta name="description" content="Блинная-кондитерская «Клубничка» в Улан-Удэ: торты по домашним рецептам с 2013 года. Ленина, 18 и Смолина, 81.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,800&family=Alegreya:wght@800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wdth,wght@62.5..100,200..400&family=Golos+Text:wght@400;500;600&display=swap">
 <style>
   :root {
-    --red: #b3121f;
-    --red-deep: #7d0a14;
-    --pink: #f6d5d8;
-    --pink-soft: #fbe9ea;
+    --red: #d6282f;
+    --red-deep: #a8141c;
+    --paper: #fffaf5;
     --beige: #f3e9de;
-    --cream: #fff8f1;
-    --choco: #3a1d17;
-    --choco-soft: #6e4a40;
-    --glass: rgba(255, 244, 240, .14);
-    --glass-line: rgba(255, 244, 240, .32);
-    --display: "Playfair Display", Georgia, serif;
-    --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+    --pink: #f8dfe1;
+    --rose: #f2cfd3;
+    --sand: #efe2cf;
+    --ink: #2b1a16;
+    --ink-soft: #6d5650;
+    --line: rgba(214, 40, 47, .35);
+    --display: "Noto Serif Display", "Didot", Georgia, serif;
+    --body: "Golos Text", "Segoe UI", system-ui, sans-serif;
     --ease: cubic-bezier(.22, 1, .36, 1);
     color-scheme: light;
   }
-  :root[data-font="b"] { --display: "Alegreya", Georgia, serif; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--beige); color: var(--choco); font: 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
-  a { color: inherit; }
-  img, video { max-width: 100%; display: block; }
-  :focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; border-radius: 8px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 var(--body); letter-spacing: .012em; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  img, video { display: block; max-width: 100%; }
+  :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 6px; }
+  .wrap { padding-inline: clamp(16px, 2.4vw, 32px); }
 
-  /* ---------------- hero ---------------- */
+  /* ---------- ribbon + menu ---------- */
+  .ribbon {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;
+    margin-top: 10px; padding: 7px 18px; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--red); font-size: 12.5px; font-weight: 500; letter-spacing: .03em;
+  }
+  .ribbon :last-child { text-align: right; }
+  .menu { display: flex; align-items: center; gap: 28px; padding-block: 14px; border-bottom: 1px solid var(--line); color: var(--red); }
+  .logo { font: 300 38px/1 var(--display); font-stretch: 62.5%; letter-spacing: -.01em; }
+  .links { display: flex; gap: clamp(18px, 3.4vw, 56px); margin-inline: auto; font-size: 16px; }
+  .links a, .more { position: relative; }
+  .links a::after, .more::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease); }
+  .links a:hover::after, .more:hover::after { transform: scaleX(1); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap;
+    font: 500 15px/1 var(--body); padding: 12px 20px; border-radius: 999px;
+    border: 1px solid var(--red); color: var(--red); background: transparent;
+    transition: background .6s var(--ease), color .6s var(--ease);
+  }
+  .btn:hover { background: var(--red); color: var(--paper); }
+
+  /* ---------- hero: back video, word, cut-out front video ---------- */
   .hero {
-    position: relative; overflow: hidden; color: var(--cream);
-    min-height: min(100svh, 980px); background: var(--red-deep);
-    display: grid; grid-template-rows: auto 1fr auto;
+    position: relative; overflow: hidden; margin-top: 14px; border-radius: 28px;
+    height: clamp(460px, 74vh, 860px); background: #7e0b13 url("media/hero-poster.jpg") center / cover;
+    isolation: isolate;
   }
-  .hero video, .hero .veil { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .hero video { object-fit: cover; }
-  .hero .veil {
-    background:
-      linear-gradient(180deg, rgba(90, 6, 14, .55) 0%, transparent 22%, transparent 62%, rgba(80, 5, 12, .72) 100%);
-    pointer-events: none;
-  }
-
-  /* the big word: screen blend makes it vanish on the cream of the cake, so it reads as sitting behind it */
+  .hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero .back { z-index: 0; }
+  .hero .front { z-index: 2; }
   .word {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%);
+    position: absolute; z-index: 1; left: 50%; top: 27%; transform: translate(-50%, -50%);
     margin: 0; white-space: nowrap; pointer-events: none;
-    font: 900 clamp(84px, 16.5vw, 310px)/.9 var(--display); letter-spacing: -.035em;
-    color: #ffe4e6; mix-blend-mode: screen;
+    font: 300 clamp(96px, 22vw, 420px)/.8 var(--display); font-stretch: 62.5%; letter-spacing: -.01em;
+    color: #fff3ec;
   }
+  .hero.flat .word { z-index: 3; mix-blend-mode: screen; }
+  .hero .under {
+    position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: end; gap: 16px;
+    padding: 22px 26px; color: #fff3ec; font-size: 14px; letter-spacing: .04em;
+    background: linear-gradient(transparent, rgba(60, 4, 9, .45));
+  }
+  .hero .under a { border-bottom: 1px solid rgba(255, 243, 236, .6); padding-bottom: 2px; }
 
-  .bar {
-    position: relative; z-index: 3; display: flex; align-items: center; gap: 20px;
-    padding: calc(22px + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 48px) 0;
-  }
-  .logo { font: 900 28px/1 var(--display); text-decoration: none; }
-  .nav {
-    display: flex; gap: 4px; padding: 5px; margin-inline: auto;
-    background: var(--glass); border: 1px solid var(--glass-line); border-radius: 999px;
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  }
-  .nav a { text-decoration: none; font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 999px; transition: background .5s var(--ease); }
-  .nav a:hover { background: rgba(255, 244, 240, .18); }
-  .pill {
-    display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; border: 0;
-    font: 700 14px/1 var(--body); padding: 14px 22px; border-radius: 999px;
-    background: var(--cream); color: var(--red-deep);
-    transition: transform .6s var(--ease), background .6s var(--ease);
-  }
-  .pill:hover { transform: translateY(-2px); background: #fff; }
-
-  .stage { position: relative; z-index: 2; }
-  .glass {
-    background: var(--glass); border: 1px solid var(--glass-line);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-radius: 22px;
-  }
-  .since {
-    position: absolute; left: clamp(16px, 4vw, 48px); top: clamp(24px, 5vh, 56px);
-    padding: 14px 18px; max-width: 250px; font-size: 13px; line-height: 1.45;
-  }
-  .since b { display: block; font: 900 26px/1.1 var(--display); margin-bottom: 4px; }
-  .motto {
-    position: absolute; right: clamp(16px, 4vw, 48px); top: clamp(24px, 5vh, 56px);
-    text-align: right; max-width: 280px; padding: 14px 18px;
-  }
-  .motto p { margin: 0; font: 900 22px/1.2 var(--display); font-style: italic; }
-  .motto span { display: block; margin-top: 6px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
-  .chips { position: absolute; right: clamp(16px, 4vw, 48px); top: calc(clamp(24px, 5vh, 56px) + 124px); display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 46%; }
-  .chip { font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; background: rgba(90, 6, 14, .38); border: 1px solid var(--glass-line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-
-  .foot {
-    position: relative; z-index: 3; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
-    padding: 0 clamp(16px, 4vw, 48px) calc(28px + env(safe-area-inset-bottom, 0px));
-  }
-  .feature { display: grid; grid-template-columns: 116px 1fr; gap: 14px; padding: 10px; max-width: 430px; }
-  .feature img { width: 116px; height: 116px; object-fit: cover; border-radius: 16px; }
-  .feature h3 { margin: 4px 0 2px; font: 900 21px/1.15 var(--display); }
-  .feature p { margin: 0; font-size: 13px; line-height: 1.45; opacity: .88; }
-  .feature .row { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-  .feature .row b { font-size: 15px; white-space: nowrap; }
-  .feature .pill { padding: 10px 16px; font-size: 13px; }
-  .where { padding: 12px 18px; font-size: 13px; line-height: 1.5; text-align: right; }
-  .where b { font-weight: 700; }
-  .scroll { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 3; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; text-decoration: none; display: grid; justify-items: center; gap: 8px; opacity: .85; }
-  .scroll i { width: 1px; height: 34px; background: linear-gradient(var(--cream), transparent); }
-
-  /* soft, syrupy entrance */
   @media (prefers-reduced-motion: no-preference) {
-    .in { animation: syrup 1.3s var(--ease) both; }
-    .word.in { animation: word 1.6s var(--ease) both; }
-    .d1 { animation-delay: .15s !important; } .d2 { animation-delay: .35s !important; }
-    .d3 { animation-delay: .55s !important; } .d4 { animation-delay: .75s !important; }
-    .scroll i { animation: drip 2.4s var(--ease) infinite; transform-origin: top; }
+    .word { animation: rise 1.8s var(--ease) .2s both; }
+    .reveal { animation: fade 1.4s var(--ease) both; }
   }
-  @keyframes syrup { from { opacity: 0; transform: translateY(26px) scale(.98); filter: blur(6px); } }
-  @keyframes word { from { opacity: 0; transform: translate(-50%, -44%) scale(.96); filter: blur(12px); } }
-  @keyframes drip { 0% { transform: scaleY(0); } 55% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+  @keyframes rise { from { opacity: 0; transform: translate(-50%, -38%); filter: blur(10px); } }
+  @keyframes fade { from { opacity: 0; transform: translateY(14px); } }
 
-  /* ---------------- red → beige transition + first section ---------------- */
-  .melt { height: 140px; background: linear-gradient(var(--red-deep), var(--pink) 60%, var(--beige)); }
-  .sec { padding: 20px clamp(16px, 4vw, 48px) 110px; max-width: 1280px; margin-inline: auto; }
-  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--red); }
-  h2 { font: 900 clamp(46px, 7vw, 104px)/.95 var(--display); letter-spacing: -.03em; margin: 12px 0 18px; color: var(--red); text-wrap: balance; }
-  .lead { max-width: 36em; color: var(--choco-soft); margin: 0 0 44px; font-size: 17px; }
-  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-  .card { background: var(--cream); border-radius: 26px; padding: 12px; display: flex; flex-direction: column; transition: transform .8s var(--ease); }
-  .card:hover { transform: translateY(-6px); }
-  .card .ph { aspect-ratio: 1; border-radius: 18px; overflow: hidden; background: var(--pink); }
-  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
-  .card:hover .ph img { transform: scale(1.05); }
-  .card .tx { padding: 16px 8px 8px; display: grid; gap: 6px; flex: 1; align-content: start; }
-  .card h3 { margin: 0; font: 900 24px/1.1 var(--display); color: var(--choco); }
-  .card p { margin: 0; font-size: 14px; color: var(--choco-soft); }
-  .card .pr { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px; margin-top: 4px; }
-  .card .pr b { font-size: 17px; font-variant-numeric: tabular-nums; }
-  .card .pr small { display: block; white-space: nowrap; font-size: 12px; color: var(--choco-soft); font-weight: 500; }
-  .card .pill { background: var(--red); color: var(--cream); padding: 11px 16px; font-size: 13px; }
-  .card .pill:hover { background: var(--red-deep); }
+  /* ---------- sections ---------- */
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding-block: 16px 22px; margin-top: 56px; border-top: 1px solid var(--line); color: var(--red); font-size: 17px; }
+  .more { white-space: nowrap; }
 
-  /* font picker, temporary: helps choose the headline face */
-  .picker {
-    position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 50;
-    display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 14px; border-radius: 999px;
-    background: var(--cream); color: var(--choco); box-shadow: 0 10px 30px -12px rgba(58, 29, 23, .5); font-size: 13px; font-weight: 600;
-  }
-  .picker button { font: 700 13px var(--body); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; background: transparent; color: var(--choco); }
-  .picker button[aria-pressed="true"] { background: var(--red); color: var(--cream); }
+  .cakes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .card { border-radius: 26px; padding: 12px 12px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .card:nth-child(4n+1) { background: var(--pink); }
+  .card:nth-child(4n+2) { background: var(--sand); }
+  .card:nth-child(4n+3) { background: var(--rose); }
+  .card:nth-child(4n+4) { background: var(--beige); }
+  .card .ph { aspect-ratio: 1; border-radius: 18px; overflow: hidden; }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease); }
+  .card:hover .ph img { transform: scale(1.045); }
+  .card h3 { margin: 0 6px; font: 300 34px/1 var(--display); font-stretch: 62.5%; color: var(--red-deep); }
+  .card p { margin: 0 6px; color: var(--ink-soft); font-size: 14px; flex: 1; }
+  .card .buy { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0 6px; }
+  .card .price { font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .card .price small { display: block; font-size: 12.5px; font-weight: 400; color: var(--ink-soft); }
+  .card .btn { padding: 10px 16px; font-size: 14px; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .split .txt { padding: clamp(8px, 2vw, 28px) clamp(0px, 2vw, 28px) 20px 0; display: flex; flex-direction: column; }
+  .big { margin: 0 0 22px; color: var(--red); font: 300 clamp(64px, 8.4vw, 150px)/.92 var(--display); font-stretch: 62.5%; letter-spacing: -.01em; text-wrap: balance; }
+  .split p { max-width: 34em; color: var(--ink-soft); margin: 0 0 26px; font-size: 17px; }
+  .steps { list-style: none; margin: auto 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 28px; }
+  .steps li { padding-block: 14px; border-top: 1px solid var(--line); font-size: 15px; }
+  .steps b { display: block; color: var(--red); font-weight: 500; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 4px; }
+  .split .img { border-radius: 26px; overflow: hidden; min-height: 460px; }
+  .split .img img { width: 100%; height: 100%; object-fit: cover; }
+
+  .info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .info > div { background: var(--beige); border-radius: 26px; padding: 26px; }
+  .info h3 { margin: 0 0 12px; font: 300 40px/1 var(--display); font-stretch: 62.5%; color: var(--red); }
+  .info ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15px; }
+  .info li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed rgba(109, 86, 80, .3); padding-bottom: 8px; }
+  .info li span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  footer { margin-top: 56px; background: var(--red); color: var(--paper); border-radius: 28px 28px 0 0; padding: 40px clamp(16px, 2.4vw, 32px) 36px; }
+  footer .name { font: 300 clamp(90px, 19vw, 360px)/.8 var(--display); font-stretch: 62.5%; margin: 0 0 32px; letter-spacing: -.01em; }
+  footer .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; font-size: 15px; border-top: 1px solid rgba(255, 250, 245, .35); padding-top: 20px; }
+  footer b { display: block; font-weight: 500; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; margin-bottom: 6px; }
+  footer .phone { user-select: all; font-variant-numeric: tabular-nums; }
 
   @media (max-width: 1000px) {
-    .nav { display: none; }
-    .bar .pill { margin-left: auto; }
-    .motto { display: none; }
-    .chips { right: 16px; top: 64%; max-width: 70%; }
-    .motto + .chips { top: auto; bottom: 8px; }
-    .where { display: none; }
-    .cards { grid-template-columns: 1fr 1fr; }
+    .links { display: none; }
+    .menu .btn { margin-left: auto; }
+    .ribbon { grid-template-columns: 1fr; text-align: center; border-radius: 18px; }
+    .ribbon span:not(:nth-child(2)) { display: none; }
+    .cakes { grid-template-columns: 1fr 1fr; }
+    .split, .info { grid-template-columns: 1fr; }
+    .split .img { min-height: 320px; }
+    footer .cols { grid-template-columns: 1fr 1fr; }
   }
-  @media (max-width: 600px) {
-    .since { max-width: 200px; }
-    .chips { display: none; }
-    .feature { grid-template-columns: 84px 1fr; }
-    .feature img { width: 84px; height: 84px; }
-    .scroll { display: none; }
-    .cards { grid-template-columns: 1fr; }
-    .picker { left: 16px; right: 16px; justify-content: space-between; }
+  @media (max-width: 560px) {
+    .hero { height: 520px; }
+    .word { top: 38%; }
+    .cakes, .steps, footer .cols { grid-template-columns: 1fr; }
+    .hero .under span { display: none; }
   }
 </style>
 
-<section class="hero" id="top">
-  <video autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-hidden="true">
-    <source src="media/hero-cake-v2.mp4" type="video/mp4">
-  </video>
-  <div class="veil"></div>
-  <h1 class="word in">Клубничка</h1>
+<div class="wrap">
+  <div class="ribbon reveal">
+    <span>Доставка по городу — 250 ₽</span>
+    <span>С 2013 года печём по домашним рецептам</span>
+    <span>Ленина, 18 · Смолина, 81</span>
+  </div>
 
-  <header class="bar in">
+  <header class="menu reveal">
     <a class="logo" href="#top">Клубничка</a>
-    <nav class="nav" aria-label="Разделы">
+    <nav class="links" aria-label="Разделы">
       <a href="#cakes">Торты</a>
-      <a href="#cakes">Напитки</a>
-      <a href="#cakes">Блины и завтраки</a>
-      <a href="#cakes">Доставка</a>
-      <a href="#cakes">Контакты</a>
+      <a href="#custom">На заказ</a>
+      <a href="#cafe">Блины и завтраки</a>
+      <a href="#cafe">Доставка</a>
+      <a href="#contacts">Контакты</a>
     </nav>
-    <a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт.">Заказать торт</a>
+    <a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт.">Заказать →</a>
   </header>
 
-  <div class="stage">
-    <div class="since glass in d1">
-      <b>с 2013 года</b>
-      Блинная-кондитерская в Улан-Удэ. Печём по домашним рецептам.
+  <section class="hero" id="top" aria-label="Торт с клубникой">
+    <video class="back" muted playsinline preload="auto" poster="media/hero-poster.jpg" aria-hidden="true">
+      <source src="media/hero-cake-back.mp4" type="video/mp4">
+    </video>
+    <h1 class="word">Клубничка</h1>
+    <video class="front" muted playsinline preload="auto" aria-hidden="true">
+      <source src="media/hero-cake-front.webm" type="video/webm">
+    </video>
+    <div class="under">
+      <span>Блинная-кондитерская · Улан-Удэ</span>
+      <a href="#cakes">Выбрать торт ↓</a>
     </div>
-    <div class="motto glass in d2">
-      <p>Торты, которые хочется повторить</p>
-      <span>из натуральных продуктов</span>
+  </section>
+
+  <div class="row-head" id="cakes">
+    <span>Торты в наличии</span>
+    <a class="more" href="#custom">Торт на заказ →</a>
+  </div>
+  <div class="cakes" id="cake-grid"></div>
+
+  <div class="row-head" id="custom">
+    <span>Торты на заказ</span>
+    <span>от 3 000 ₽ за кг</span>
+  </div>
+  <div class="split">
+    <div class="txt">
+      <h2 class="big">Торт для вашего праздника</h2>
+      <p>Свадьба, день рождения, выпускной. Кондитеры соберут торт с вашим оформлением: цвета, надпись, фигурки. Каждый получается единственным.</p>
+      <ol class="steps">
+        <li><b>Дата</b>Выберите день и прикиньте число гостей</li>
+        <li><b>Начинка</b>Бисквит и крем из нашего каталога</li>
+        <li><b>Заявка</b>Напишите нам, менеджер уточнит дизайн</li>
+        <li><b>Праздник</b>Заберите торт или закажите доставку</li>
+      </ol>
+      <p style="margin:26px 0 0"><a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт на праздник.">Оставить заявку →</a></p>
     </div>
-    <div class="chips in d3">
-      <span class="chip">Домашние рецепты</span>
-      <span class="chip">Целый или половинка</span>
-      <span class="chip">Доставка по городу</span>
-    </div>
+    <div class="img"><img src="media/web/wedding.jpg" alt="Свадебный торт от «Клубнички»" loading="lazy"></div>
   </div>
 
-  <div class="foot">
-    <article class="feature glass in d3">
-      <img src="media/web/cake-07.jpg" alt="Торт «Клубничка»: ванильный бисквит, белый крем и клубничный конфитюр сверху">
-      <div>
-        <h3>Торт «Клубничка»</h3>
-        <p>Ванильный бисквит, клубничный конфитюр, сметанный крем.</p>
-        <div class="row"><b>1 кг · 1 200 ₽</b><a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Клубничка».">Заказать</a></div>
-      </div>
-    </article>
-    <div class="where glass in d4">
-      <b>Ленина, 18</b> · <b>Смолина, 81</b><br>каждый день 9:00–20:00
+  <div class="row-head" id="cafe">
+    <span>Кафе и доставка</span>
+    <span>каждый день 9:00–20:00</span>
+  </div>
+  <div class="info">
+    <div>
+      <h3>Блины</h3>
+      <ul>
+        <li><span>Сырный</span><span>175 ₽</span></li>
+        <li><span>Нежность · курица, грибы</span><span>220 ₽</span></li>
+        <li><span>Королевский · сёмга</span><span>350 ₽</span></li>
+        <li><span>Клубника в облаках</span><span>205 ₽</span></li>
+        <li><span>Клубника со сливками</span><span>230 ₽</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Завтраки</h3>
+      <ul>
+        <li><span>Глазунья, сосиска гриль, тост</span><span>250 ₽</span></li>
+        <li><span>Омлет с начинкой, тост</span><span>250 ₽</span></li>
+        <li><span>Глазунья, шампиньоны, салат</span><span>250 ₽</span></li>
+      </ul>
+      <p style="margin:14px 0 0;font-size:14px;color:var(--ink-soft)">Каждый день с 9 до 11, на Ленина, 18</p>
+    </div>
+    <div>
+      <h3>Доставка</h3>
+      <ul>
+        <li><span>По городу</span><span>250 ₽</span></li>
+        <li><span>Часы доставки</span><span>10:00–18:00</span></li>
+        <li><span>Выходной доставки</span><span>среда</span></li>
+        <li><span>Самовывоз</span><span>бесплатно</span></li>
+      </ul>
     </div>
   </div>
-  <a class="scroll in d4" href="#cakes">Листайте<i></i></a>
-</section>
-
-<div class="melt" aria-hidden="true"></div>
-
-<section class="sec" id="cakes">
-  <div class="eyebrow">Торты в наличии</div>
-  <h2>Забирайте сегодня</h2>
-  <p class="lead">Эти торты всегда есть в кафе на Ленина, 18 и Смолина, 81. Можно взять целый торт или половинку.</p>
-  <div class="cards">
-    <article class="card">
-      <div class="ph"><img src="media/web/cake-07.jpg" alt="Торт «Клубничка»" loading="lazy"></div>
-      <div class="tx"><h3>Клубничка</h3><p>Ванильный бисквит, клубничный конфитюр, сметанный крем, белый шоколад.</p></div>
-      <div class="pr"><div><b>1 200 ₽</b><small>1 кг · половинка 750 ₽</small></div><a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Клубничка».">Заказать</a></div>
-    </article>
-    <article class="card">
-      <div class="ph"><img src="media/web/cake-05.jpg" alt="Торт «Искушение»" loading="lazy"></div>
-      <div class="tx"><h3>Искушение</h3><p>Бисквит «красный бархат» и крем-чиз.</p></div>
-      <div class="pr"><div><b>1 400 ₽</b><small>1 кг · половинка 870 ₽</small></div><a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Искушение».">Заказать</a></div>
-    </article>
-    <article class="card">
-      <div class="ph"><img src="media/web/cake-06.jpg" alt="Торт «Молочная девочка»" loading="lazy"></div>
-      <div class="tx"><h3>Молочная девочка</h3><p>Бисквит на сгущённом молоке, крем-чиз, песочная крошка.</p></div>
-      <div class="pr"><div><b>1 400 ₽</b><small>1 кг · половинка 870 ₽</small></div><a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Молочная девочка».">Заказать</a></div>
-    </article>
-    <article class="card">
-      <div class="ph"><img src="media/web/cake-04.jpg" alt="Торт «Шоколадно-банановый»" loading="lazy"></div>
-      <div class="tx"><h3>Шоколадно-банановый</h3><p>Бисквит-зебра, банановая прослойка, сметанный крем.</p></div>
-      <div class="pr"><div><b>1 200 ₽</b><small>1 кг · половинка 750 ₽</small></div><a class="pill wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «Шоколадно-банановый».">Заказать</a></div>
-    </article>
-  </div>
-</section>
-
-<div class="picker" role="group" aria-label="Шрифт заголовков">
-  Шрифт:
-  <button type="button" data-f="a" aria-pressed="true">Playfair</button>
-  <button type="button" data-f="b" aria-pressed="false">Alegreya</button>
 </div>
 
+<footer id="contacts">
+  <p class="name">Клубничка</p>
+  <div class="cols">
+    <div><b>Кафе</b>Ленина, 18<br><span class="phone">+7 950 385-19-88</span></div>
+    <div><b>Филиал</b>Смолина, 81<br><span class="phone">+7 924 777-24-47</span></div>
+    <div><b>Часы</b>Каждый день<br>9:00–20:00</div>
+    <div><b>Мы в сети</b><a href="https://vk.com/tortynazakazulanude" target="_blank" rel="noopener">ВКонтакте</a><br><a href="https://instagram.com/tort_klubnichka" target="_blank" rel="noopener">Instagram</a></div>
+  </div>
+</footer>
+
 <script>
+  const cakes = [
+    ["Клубничка", "Ванильный бисквит, клубничный конфитюр, сметанный крем, белый шоколад.", 1200, 750, "07"],
+    ["Искушение", "Бисквит «красный бархат» и крем-чиз.", 1400, 870, "05"],
+    ["Молочная девочка", "Бисквит на сгущённом молоке, крем-чиз, песочная крошка.", 1400, 870, "06"],
+    ["Шоколадно-банановый", "Бисквит-зебра, банановая прослойка, сметанный крем.", 1200, 750, "04"],
+    ["Нежность", "Ванильный бисквит и сметанный крем.", 1200, 750, "08"],
+    ["Прага", "Шоколадный бисквит, крем на сгущёнке, шоколадная глазурь.", 1200, 750, "09"],
+    ["Тофифи", "Карамельный бисквит, сливочный крем, карамельная глазурь.", 1300, 810, "11"],
+    ["Шоколад Шоколад", "Какао-бисквит, шоколадный крем-чиз, песочная крошка.", 1400, 870, "13"]
+  ];
+  const rub = n => n.toLocaleString("ru-RU") + " ₽";
+  document.getElementById("cake-grid").innerHTML = cakes.map(([name, d, whole, half, img]) => `
+    <article class="card">
+      <div class="ph"><img src="media/web/cake-${img}.jpg" alt="Торт «${name}»" loading="lazy"></div>
+      <h3>${name}</h3>
+      <p>${d}</p>
+      <div class="buy">
+        <div class="price">${rub(whole)} · 1 кг<small>половинка ${rub(half)}</small></div>
+        <a class="btn wa" href="#" data-msg="Здравствуйте! Хочу заказать торт «${name}».">Заказать</a>
+      </div>
+    </article>`).join("");
+
   const WA = "79503851988";
   document.querySelectorAll("a.wa").forEach(a => {
     a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(a.dataset.msg);
@@ -263,12 +274,24 @@
     a.rel = "noopener";
   });
 
-  const root = document.documentElement;
-  const pick = f => {
-    root.dataset.font = f;
-    document.querySelectorAll(".picker button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === f));
-    try { localStorage.setItem("klub-font", f); } catch (e) {}
-  };
-  document.querySelectorAll(".picker button").forEach(b => b.addEventListener("click", () => pick(b.dataset.f)));
-  try { const saved = localStorage.getItem("klub-font"); if (saved) pick(saved); } catch (e) {}
+  // Two synced layers: the full video behind the word, the cut-out cake in front of it.
+  const hero = document.querySelector(".hero");
+  const back = hero.querySelector(".back");
+  const front = hero.querySelector(".front");
+  const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+  const alphaOk = !isSafari && front.canPlayType('video/webm; codecs="vp9"') !== "";
+  if (!alphaOk) { front.remove(); hero.classList.add("flat"); }
+
+  const layers = alphaOk ? [back, front] : [back];
+  const restart = () => layers.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+  back.addEventListener("ended", restart);
+  if (alphaOk) {
+    const sync = () => {
+      if (Math.abs(front.currentTime - back.currentTime) > 0.06) front.currentTime = back.currentTime;
+      requestAnimationFrame(sync);
+    };
+    requestAnimationFrame(sync);
+  }
+  Promise.all(layers.map(v => new Promise(r => v.readyState >= 3 ? r() : v.addEventListener("canplaythrough", r, { once: true }))))
+    .then(restart);
 </script>
