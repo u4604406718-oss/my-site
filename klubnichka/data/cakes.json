@@ -1,0 +1,282 @@
+[
+  {
+    "title": "Корпусное пирожное КОФЕ",
+    "description": "Корпусное пирожное КОФЕ",
+    "price_from": 350,
+    "sizes": [],
+    "photos": [
+      "media/cakes/01-1.png",
+      "media/cakes/01-2.png",
+      "media/cakes/01-3.png"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-144343682282-korpusnoe-pirozhnoe-kofe"
+  },
+  {
+    "title": "Корпусное пирожное ЛИМОН",
+    "description": "Корпусное пирожное ЛИМОН",
+    "price_from": 350,
+    "sizes": [],
+    "photos": [
+      "media/cakes/02-1.png",
+      "media/cakes/02-2.png",
+      "media/cakes/02-3.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-611596331023-korpusnoe-pirozhnoe-limon"
+  },
+  {
+    "title": "Корпусное пирожное МАЛИНА",
+    "description": "Корпусное пирожное МАЛИНА",
+    "price_from": 350,
+    "sizes": [],
+    "photos": [
+      "media/cakes/03-1.jpg",
+      "media/cakes/03-2.png"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-407844043463-korpusnoe-pirozhnoe-malina"
+  },
+  {
+    "title": "Шоколадно-банановый",
+    "description": "Двухцветный бисквит типа зебры с нежнейшей банановой прослойкой. Натуральный сметанный крем, украшен шоколадной крошкой.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1200
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/04-1.jpg",
+      "media/cakes/04-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-749559461791-shokoladno-bananovii"
+  },
+  {
+    "title": "Искушение",
+    "description": "Бисквит красный бархат, крем-чиз.",
+    "price_from": 870,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1400
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 870
+      }
+    ],
+    "photos": [
+      "media/cakes/05-1.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-651321090902-iskushenie"
+  },
+  {
+    "title": "Молочная девочка",
+    "description": "Нежный бисквит на основе сгущенного молока, прослойка крем-чиз, украшен песочной крошкой.",
+    "price_from": 870,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1400
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 870
+      }
+    ],
+    "photos": [
+      "media/cakes/06-1.jpg",
+      "media/cakes/06-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-366312796031-molochnaya-devochka"
+  },
+  {
+    "title": "Клубничка",
+    "description": "Нежный ванильный бисквит с прослойкой из клубничного конфитюра со сметанным кремом, украшен белой шоколадной крошкой.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1200
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/07-1.jpg",
+      "media/cakes/07-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-373254344801-klubnichka"
+  },
+  {
+    "title": "Нежность",
+    "description": "Нежный ванильный бисквит, сметанный крем.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1200
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/08-1.jpg",
+      "media/cakes/08-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-401039843681-nezhnost"
+  },
+  {
+    "title": "Прага",
+    "description": "Нежный шоколадный бисквит с коньячной или кофейной пропиткой, крем сгущенное молоко со сливочным маслом, украшен шоколадной глазурью.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1200
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/09-1.jpg",
+      "media/cakes/09-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-735010298891-praga"
+  },
+  {
+    "title": "Свадебный торт",
+    "description": "Торт, достойный Вашего торжества. Стоимость от 3000 р. за 1 кг.",
+    "price_from": 1100,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 3000
+      },
+      {
+        "size": "целый торт 1000гр",
+        "price": 1100
+      }
+    ],
+    "photos": [
+      "media/cakes/10-1.png",
+      "media/cakes/10-2.webp",
+      "media/cakes/10-3.webp",
+      "media/cakes/10-4.webp",
+      "media/cakes/10-5.webp",
+      "media/cakes/10-6.png",
+      "media/cakes/10-7.png",
+      "media/cakes/10-8.png",
+      "media/cakes/10-9.png"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-593970797662-svadebnii-tort"
+  },
+  {
+    "title": "Тофифи",
+    "description": "Карамельный бисквит, сливочный крем, сверху полит карамельной глазурью, по бокам песочная крошка.",
+    "price_from": 810,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1300
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 810
+      }
+    ],
+    "photos": [
+      "media/cakes/11-1.jpg",
+      "media/cakes/11-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-180411157601-tofifi"
+  },
+  {
+    "title": "Черемуховый",
+    "description": "Черемуховый бисквит, пропитан сметанным кремом, украшен белой шоколадной крошкой.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1200
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/12-1.jpg",
+      "media/cakes/12-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-817739572711-cheremuhovii"
+  },
+  {
+    "title": "Шоколад Шоколад",
+    "description": "Нежный бисквит на основе сгущенного молока с какао, прослойка шоколадный крем чиз, украшен песочной крошкой.",
+    "price_from": 870,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1400
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 870
+      }
+    ],
+    "photos": [
+      "media/cakes/13-1.jpg",
+      "media/cakes/13-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-564711950051-shokolad-shokolad"
+  },
+  {
+    "title": "Королевский",
+    "description": "Нежный бисквит, чередование коржей с маком и грецким орехом, сметанный крем, украшен песочной крошкой.",
+    "price_from": 750,
+    "sizes": [
+      {
+        "size": "половина торта 1000 гр",
+        "price": 1200
+      },
+      {
+        "size": "целый торт 500гр",
+        "price": 750
+      }
+    ],
+    "photos": [
+      "media/cakes/14-1.jpg",
+      "media/cakes/14-2.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-798080266661-korolevskii"
+  },
+  {
+    "title": "Морковный",
+    "description": "Торт \"Морковный\":\n- пряный бисквит на основе моркови и грецких орехов, с легкой ноткой корицы\n- прослойка нежный крем-чиз\n- по бокам торт украшен песочной крошкой.",
+    "price_from": 870,
+    "sizes": [
+      {
+        "size": "целый торт 1000гр",
+        "price": 1400
+      },
+      {
+        "size": "половина торта 500 гр",
+        "price": 870
+      }
+    ],
+    "photos": [
+      "media/cakes/15-1.jpg"
+    ],
+    "source_url": "http://tortklubnichka.ru/tproduct/633844506-891620090271-morkovnii"
+  }
+]
