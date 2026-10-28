@@ -52,6 +52,31 @@ Luxury patisserie commercial photography, 3:2. Box completely blank, no text, no
 Кадр 3 v3 делать с **кадром 1** как референсом; кадр 4 v3 — с **кадром 3 v3** (чтобы коробка была та же).
 Видео: `… layers reassemble → the cake lands in the open box → the lid closes → the ribbon ties → final closed-box hero shot.`
 
+## Бесплатное видео: три перехода «первый → последний кадр» (28.10.2026)
+Бесплатные генераторы с режимом «start frame + end frame» (Kling, Luma Dream Machine, LTX, Google Flow) делают ролик
+**между двумя картинками**, 5–10 с. Поэтому делаем **три коротких клипа** и склеиваем:
+`1-floating → 2-explosion`, `2-explosion → 3-box-open`, `3-box-open → 4-box-closed`.
+Конец клипа = начало следующего, поэтому склейка незаметна. Склеить — ffmpeg (агент сделает), бесплатно.
+На бесплатных тарифах обычно водяной знак и 720p — для учёбы и пробы нормально.
+
+### Клип A: 1 → 2 (взрыв)
+```
+The floating strawberry cream cake slowly rotates, then lifts slightly and bursts apart into separate floating layers:
+sponge, cream, strawberries. Cream stretches before separating, sauce droplets and strawberry slices fly outward.
+Smooth cinematic motion, camera slowly pulls back a little. Same pistachio studio background. No cuts.
+```
+### Клип B: 2 → 3 (сборка и падение в коробку)
+```
+The floating layers fall back together into the whole cake, which gently descends and lands inside an open cream-white gift box,
+the last strawberries drop onto the top with a soft splash of cream. Camera follows smoothly and tilts down slightly.
+Same pistachio studio background. No cuts.
+```
+### Клип C: 3 → 4 (крышка и бант)
+```
+The lid of the gift box closes smoothly over the cake, the pistachio satin ribbon wraps around the box and ties into a neat bow.
+Camera slowly pushes in. Calm, elegant motion. Same pistachio studio background. No cuts.
+```
+
 ## Модель и стоимость
 - Higgsfield: GPT Image 2.5, high, 3:2 — 1,5 кредита за кадр (на 28.10.2026 кредитов 0).
 - **Бесплатно:** ChatGPT или Gemini. Все 4 кадра делать **в одном чате**, к каждому прикладывать исходное фото торта.
