@@ -24,6 +24,34 @@
 
 Фон сайта потом = фон видео (тот же цвет), чтобы торт «стоял» прямо на странице.
 
+
+## ✅ Финал v3 (28.10.2026, решение Ирины): красивая коробка, без дешёвого стола
+Кадры 1 и 2 готовы. Кадр 3 с белой коробкой на деревянном столе — дёшево. Кадр 4 с отрезанным кусочком — торт «нарезан ровными кусками», не понравилось.
+Решение: **коробка остаётся, но премиальная**, стоит на бесшовном фисташковом «полу» той же студии (без стола и горизонта).
+Финал как у пиццы — **закрытая коробка**, без разреза торта.
+
+### Кадр 3 v3 — торт опускается в открытую коробку
+```
+Use the uploaded image as the exact reference for the cake, cream, strawberries, background colour and lighting.
+The same whole strawberry cream cake gently lands inside an open premium rigid gift box: matte cream-white box with a thin pistachio green rim,
+the lid standing open behind it, a pistachio satin ribbon lying loosely beside the box.
+The box stands on a seamless pistachio green studio surface that curves smoothly into the same soft pistachio gradient background —
+no table, no wood, no wall, no horizon line. The last two strawberries are still dropping onto the top, a tiny soft splash of cream.
+Warm soft studio light from upper left, soft natural shadow under the box. Camera slightly above, about 20 degrees.
+Luxury patisserie commercial photography, 3:2. The cake stays whole, not sliced. Box completely blank, no text, no logos, no people.
+```
+
+### Кадр 4 v3 — закрытая коробка с лентой (финал)
+```
+Use the uploaded image as the exact reference for the box, ribbon, background and lighting.
+The same premium matte cream-white gift box with thin pistachio rim, now closed with its lid, tied with the pistachio satin ribbon in a neat bow.
+Two fresh strawberries and a small swirl of cream rest next to the box on the same seamless pistachio studio surface,
+same soft pistachio gradient background, no table, no horizon line. Calm luxury hero shot, warm soft light from upper left.
+Luxury patisserie commercial photography, 3:2. Box completely blank, no text, no logos, no people.
+```
+Кадр 3 v3 делать с **кадром 1** как референсом; кадр 4 v3 — с **кадром 3 v3** (чтобы коробка была та же).
+Видео: `… layers reassemble → the cake lands in the open box → the lid closes → the ribbon ties → final closed-box hero shot.`
+
 ## Модель и стоимость
 - Higgsfield: GPT Image 2.5, high, 3:2 — 1,5 кредита за кадр (на 28.10.2026 кредитов 0).
 - **Бесплатно:** ChatGPT или Gemini. Все 4 кадра делать **в одном чате**, к каждому прикладывать исходное фото торта.
