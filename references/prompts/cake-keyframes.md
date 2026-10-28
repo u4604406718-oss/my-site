@@ -9,7 +9,10 @@
 |---|---|---|
 | Красный торт на красном фоне | **Контрастный фон** (см. ниже) | Красная клубника сливается с красным фоном, теряется объём. У пиццы фон тоже одного тона, но корж и сыр жёлто-белые и отделяются от оранжевого; у торта такого разделения нет. |
 | Торт на красной подставке | **Торт парит в воздухе** | Как пицца: ничто не мешает «взрыву» на слои, кадр чище, на сайте торт можно вырезать и поставить где угодно. Подставка — лишний предмет, который тоже надо анимировать. |
-| — | **Финал: торт в открытой коробке кондитерской на столе** | Как пицца в коробке: финальный кадр продаёт доставку/заказ, а не просто красивый десерт. |
+| — | ~~Финал: торт в открытой коробке кондитерской на столе~~ | **Отменено 28.10.2026 после пробы:** стол и белая коробка выглядят дёшево, появилась «стена с горизонтом» вместо студийного фона. Ирине не понравилось. |
+| — | **Финал: торт собирается и остаётся парить в той же фисташковой студии, потом отделяется кусочек** | Один бесшовный фон на весь ролик = премиально (правило шаблона фото товаров: «no props, no floor»; визуал референсов: продукт на чистом фоне). Сайт сам «продаёт» кнопкой, коробка в кадре не нужна. |
+
+**Урок для агента:** промпт пиццы рассчитан на бренд с узнаваемой коробкой (Додо). Без фирменной упаковки «коробка + стол» превращаются в дешёвый реквизит. Финал брать из логики продукта: у торта самое вкусное — разрез со слоями.
 
 ### Фон — три варианта (выбрать один, вставить вместо `[BACKGROUND]`)
 1. ✅ **Выбран 28.10.2026. Фисташковый / мятный:** `soft pistachio green gradient background, #B9D8B0 to #8FBF8A`.
@@ -26,7 +29,7 @@
 - **Бесплатно:** ChatGPT или Gemini. Все 4 кадра делать **в одном чате**, к каждому прикладывать исходное фото торта.
 
 ## Сюжет
-торт парит и медленно вращается → **разлетается на слои** → слои падают обратно и собираются → торт опускается в открытую коробку на столе → кусочек.
+торт парит и медленно вращается → **разлетается на слои** → слои собираются обратно в воздухе → камера приближается, отделяется кусочек. Весь ролик в одной фисташковой студии.
 
 ## Кадр 1 — старт (торт парит)
 ```
@@ -48,25 +51,25 @@ Premium food commercial photography, controlled cinematic explosion, sharp focus
 Do not add text, logos, people or new ingredients.
 ```
 
-## Кадр 3 — сборка и приземление
+## Кадр 3 — сборка (торт снова целый, парит)
 ```
-Use the uploaded image as the exact reference for the cake, cream and strawberries.
-The layers of the strawberry cream cake fall back together and land inside an open plain white pastry box
-standing on a light wooden table; the cake is almost fully reassembled, last strawberries dropping onto the top,
-a soft splash of cream and sauce droplets at the moment of impact.
-The [BACKGROUND] continues behind the table. Same warm lighting, slight motion blur on falling pieces.
-Premium food commercial photography, 3:2. Do not add text, logos, people or extra objects.
+Use the uploaded image as the exact reference for the cake, cream, strawberries, background and lighting.
+The layers of the same strawberry cream cake have just snapped back together in mid-air: the cake is whole again and floats in the same position,
+the last few strawberries are still dropping onto the top, a small soft splash of cream and a few sauce droplets around the top edge.
+Same seamless soft pistachio green gradient studio background, no table, no floor, no box, no stand, no horizon line.
+Same warm soft light from upper left, soft shadow far below, slight motion blur only on the falling strawberries.
+Premium food commercial photography, 3:2. Do not add text, logos, people or props. Do not change the cake design.
 ```
 
-## Кадр 4 — финал (продающий)
+## Кадр 4 — финал (разрез со слоями)
 ```
-Use the uploaded image as the exact reference for the cake, cream and strawberries.
-The finished strawberry cream cake inside the open plain white pastry box on a light wooden table,
-one perfect slice cut and slightly pulled out, showing clean layers of sponge, cream and strawberries.
-A few fresh strawberries next to the box. [BACKGROUND] behind. Calm, appetizing, warm soft studio light.
-Premium food commercial photography, hero shot, 3:2. Do not add text, logos or people.
+Use the uploaded image as the exact reference for the cake, cream, strawberries, background and lighting.
+The same whole strawberry cream cake floats calmly in mid-air; one perfect triangular slice has separated and floats slightly out toward the camera,
+showing clean layers of sponge, cream and strawberries inside. Two or three strawberry halves float nearby.
+Same seamless soft pistachio green gradient studio background, no table, no floor, no box, no stand.
+Calm, appetizing, warm soft studio light from upper left, gentle shadow far below. Premium food commercial photography, hero shot, 3:2.
+Do not add text, logos, people or props.
 ```
-Коробка без надписей: логотип кондитерской клиента добавляется потом (или своим брендом для портфолио).
 
 ## Видео по кадрам (когда 4 кадра готовы, в Higgsfield)
 ```
@@ -78,14 +81,13 @@ the camera moves closer and subtly orbits.
 IMAGE 1 → IMAGE 2 — EXPLOSION: the cake deconstructs into floating layers (sponge, cream, strawberries),
 cream stretches before separating, strawberry slices and sauce droplets fly outward. Controlled cinematic explosion, not a cut.
 At the peak recreate Image 2 as closely as possible.
-IMAGE 2 → IMAGE 3 — REASSEMBLY AND FALL: the layers reverse and fall back together, gravity pulls the whole cake down,
-the camera follows, a light wooden table and an open white pastry box appear underneath, the cake lands in the box
-with a soft splash of cream. Match Image 3.
-IMAGE 3 → IMAGE 4 — FINAL: the camera slowly pushes in, a slice separates and slides out showing the layers. End exactly on Image 4.
+IMAGE 2 → IMAGE 3 — REASSEMBLY: the layers reverse and snap back together in mid-air, the last strawberries drop onto the top
+with a soft splash of cream. The cake stays floating in the same seamless pistachio studio. Match Image 3.
+IMAGE 3 → IMAGE 4 — FINAL: the camera slowly pushes in, one slice separates and floats out toward the camera showing the layers. End exactly on Image 4.
 
 Style: high-end dessert commercial, realistic food physics, glossy sauce, soft cream, warm light,
 the same background colour throughout, smooth camera, subtle motion blur, never shaky.
-Do NOT add text, people, new ingredients or environments. Do NOT redesign the cake or the box.
+Do NOT add text, people, new ingredients, tables, boxes or environments. Do NOT redesign the cake.
 Duration about 10 seconds, aspect ratio 16:9.
 ```
 
@@ -101,7 +103,7 @@ Duration about 10 seconds, aspect ratio 16:9.
 | **Marlin / Orven** (`water-marlin.md`, `sunglasses-orven.md`) | генерация даёт ~10 с → если нужно длиннее, два клипа со стыком «последний кадр = первый кадр» | видео |
 | **visual.md + copy.md** | герой крупно по центру, заголовок «утверждение + поворот», один акцент | для сайта |
 
-### Вариант финала «как у пиццы» (кадр 4б — закрытая коробка)
+### ~~Вариант финала «как у пиццы» (кадр 4б — закрытая коробка)~~ — отклонён: только для бренда с фирменной премиальной упаковкой
 ```
 Use the uploaded image as the exact reference for the cake.
 The same white pastry box on the light wooden table, now closed, a few fresh strawberries and a little cream on the table next to it,
