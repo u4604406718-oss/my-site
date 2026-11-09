@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Одень по погоде — игра Gatti</title>
+<meta name="theme-color" content="#f4efe8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,600;0,700;1,600&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ivory: #f4efe8;
+    --ivory-2: #ebe3d8;
+    --ink: #1c1a18;
+    --ink-soft: #6d665e;
+    --camel: #b08968;
+    --camel-2: #d4b896;
+    --white: #fffdf9;
+    --good: #4d7c5a;
+    --bad: #b5523b;
+    --ease: cubic-bezier(.2, 0, 0, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { min-height: 100%; background: var(--ivory); }
+  body {
+    font-family: "Manrope", system-ui, sans-serif; color: var(--ink);
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+    display: flex; justify-content: center;
+  }
+  .app { width: 100%; max-width: 460px; min-height: 100dvh; display: flex; flex-direction: column;
+    padding: max(14px, env(safe-area-inset-top)) 18px max(14px, env(safe-area-inset-bottom)); position: relative; }
+
+  /* ---------- top bar ---------- */
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: "Cormorant", serif; font-weight: 700; font-size: 26px; letter-spacing: .18em; text-transform: uppercase; }
+  .round { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+  .stars { font-size: 13px; font-weight: 800; }
+
+  /* ---------- weather card ---------- */
+  .weather {
+    margin-top: 12px; border-radius: 22px; padding: 16px 18px; color: var(--white); position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 14px; transition: background .6s var(--ease);
+    box-shadow: 0 18px 40px -24px rgba(28,26,24,.6);
+  }
+  .weather .ico { font-size: 44px; line-height: 1; }
+  .weather .city { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .8; }
+  .weather .temp { font-family: "Cormorant", serif; font-weight: 700; font-size: 40px; line-height: 1; }
+  .weather .desc { font-size: 14px; opacity: .9; }
+  .timer { position: absolute; left: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.75); width: 100%; transform-origin: left; }
+
+  /* ---------- figure ---------- */
+  .stage { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; min-height: 190px; }
+  .stage svg { height: min(28vh, 300px); width: auto; filter: drop-shadow(0 16px 20px rgba(28,26,24,.12)); }
+  .slot-badge {
+    position: absolute; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+    background: var(--white); font-size: 34px; box-shadow: 0 10px 24px -12px rgba(28,26,24,.45);
+    transform: scale(0); transition: transform .45s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  .slot-badge.on { transform: scale(1); }
+  .slot-badge small { position: absolute; bottom: -18px; font-size: 10px; font-weight: 700; white-space: nowrap; color: var(--ink-soft); }
+  .b-acc { left: 4%; top: 18%; } .b-top { right: 4%; top: 34%; } .b-shoes { left: 8%; bottom: 8%; }
+
+  /* ---------- wardrobe ---------- */
+  .ward { display: grid; gap: 10px; }
+  .row-title { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin: 2px 0 6px; }
+  .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .chip {
+    border: 0; background: var(--white); border-radius: 16px; padding: 8px 4px 9px; cursor: pointer; font: inherit;
+    display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 66px;
+    box-shadow: inset 0 0 0 1.5px transparent, 0 6px 14px -10px rgba(28,26,24,.4);
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+  }
+  .chip span { font-size: 26px; line-height: 1.1; }
+  .chip b { font-size: 10.5px; font-weight: 700; line-height: 1.15; color: var(--ink-soft); text-align: center; }
+  .chip:active { transform: scale(.95); }
+  .chip.sel { background: var(--ink); box-shadow: 0 10px 20px -12px rgba(28,26,24,.8); }
+  .chip.sel b { color: var(--white); }
+
+  .btn {
+    margin-top: 14px; width: 100%; border: 0; cursor: pointer; border-radius: 999px; padding: 17px; position: relative; overflow: hidden;
+    font: 800 15px "Manrope", sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--white); background: var(--ink);
+    transition: opacity .2s var(--ease), transform .2s var(--ease);
+  }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .35; }
+  .btn.light { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+  /* ---------- overlay screens ---------- */
+  .screen {
+    position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 16px; padding: 28px 26px; background: var(--ivory);
+    transition: opacity .45s var(--ease), transform .45s var(--ease);
+  }
+  .screen.hidden { opacity: 0; transform: translateY(12px); pointer-events: none; }
+  .screen .inner { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--camel); }
+  h1 { font-family: "Cormorant", serif; font-weight: 700; font-size: clamp(46px, 13vw, 64px); line-height: .92; }
+  h1 em { font-style: italic; color: var(--camel); }
+  .lead { font-size: 15px; line-height: 1.45; color: var(--ink-soft); max-width: 32ch; }
+  .tiles { display: flex; gap: 8px; font-size: 26px; }
+  .tiles span { background: var(--white); border-radius: 14px; width: 52px; height: 52px; display: grid; place-items: center; box-shadow: 0 6px 14px -10px rgba(28,26,24,.4); }
+  .verdict { width: 100%; display: grid; gap: 8px; text-align: left; }
+  .verdict div { background: var(--white); border-radius: 14px; padding: 11px 14px; font-size: 14px; display: flex; gap: 10px; align-items: center; }
+  .verdict .ok { box-shadow: inset 3px 0 0 var(--good); }
+  .verdict .no { box-shadow: inset 3px 0 0 var(--bad); }
+  .code { font-family: "Cormorant", serif; font-weight: 700; font-size: 34px; letter-spacing: .14em; padding: 12px 26px; border: 1.5px dashed var(--camel); border-radius: 16px; background: var(--white); }
+  .fine { font-size: 12px; color: var(--ink-soft); max-width: 34ch; line-height: 1.4; }
+  .credit { text-align: center; font-size: 11px; color: var(--ink-soft); margin-top: 10px; opacity: .8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slot-badge, .screen, .chip, .weather { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <div class="logo">Gatti</div>
+    <div class="round" id="round">Образ 1 / 3</div>
+    <div class="stars" id="stars">★ 0</div>
+  </div>
+
+  <section class="weather" id="weather" aria-live="polite">
+    <div class="ico" id="w-ico">❄️</div>
+    <div>
+      <div class="city">Улан-Удэ · сегодня</div>
+      <div class="temp" id="w-temp">−27°</div>
+      <div class="desc" id="w-desc">ясно, ветер</div>
+    </div>
+    <div class="timer" id="timer"></div>
+  </section>
+
+  <section class="stage" aria-label="Образ на модели">
+    <svg viewBox="0 0 120 300" aria-hidden="true">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#d4b896"/><stop offset="1" stop-color="#b08968"/>
+        </linearGradient>
+      </defs>
+      <!-- силуэт модели -->
+      <circle cx="60" cy="34" r="19" fill="url(#g)"/>
+      <path d="M41 30 Q60 4 79 30 Q78 16 60 13 Q42 16 41 30Z" fill="#1c1a18"/>
+      <rect x="53" y="52" width="14" height="12" rx="5" fill="url(#g)"/>
+      <path d="M32 72 Q60 58 88 72 L84 150 Q60 158 36 150Z" fill="#1c1a18" opacity=".9" id="body-top"/>
+      <path d="M32 74 L20 140 Q18 148 25 148 L38 92Z" fill="url(#g)"/>
+      <path d="M88 74 L100 140 Q102 148 95 148 L82 92Z" fill="url(#g)"/>
+      <path d="M38 150 L82 150 L76 260 L64 260 L60 175 L56 260 L44 260Z" fill="#3d3833"/>
+      <rect x="42" y="258" width="16" height="14" rx="6" fill="#1c1a18"/>
+      <rect x="62" y="258" width="16" height="14" rx="6" fill="#1c1a18"/>
+      <ellipse cx="60" cy="286" rx="34" ry="6" fill="rgba(28,26,24,.12)"/>
+    </svg>
+    <div class="slot-badge b-acc" id="badge-acc"><span></span><small></small></div>
+    <div class="slot-badge b-top" id="badge-top"><span></span><small></small></div>
+    <div class="slot-badge b-shoes" id="badge-shoes"><span></span><small></small></div>
+  </section>
+
+  <section class="ward" id="ward"></section>
+  <button class="btn" id="done" disabled>Готово</button>
+  <div class="credit">Игра: @ariela_ra</div>
+</main>
+
+<!-- старт -->
+<section class="screen" id="s-start">
+  <div class="inner">
+    <div class="eyebrow">Gatti · игра</div>
+    <h1>Одень<br>по <em>погоде</em></h1>
+    <p class="lead">Сибирь не прощает ошибок 😉 Три прогноза — три образа. Собери 7 звёзд из 9 и забери промокод.</p>
+    <div class="tiles"><span>🧥</span><span>🧣</span><span>👢</span></div>
+    <button class="btn" id="play">Начать</button>
+    <p class="fine">На каждый образ 20 секунд</p>
+  </div>
+</section>
+
+<!-- итог раунда -->
+<section class="screen hidden" id="s-round" aria-live="assertive">
+  <div class="inner">
+    <div class="eyebrow" id="r-eyebrow">Образ 1 из 3</div>
+    <h1 id="r-title">3 из 3</h1>
+    <div class="verdict" id="r-list"></div>
+    <button class="btn" id="next">Дальше</button>
+  </div>
+</section>
+
+<!-- финал -->
+<section class="screen hidden" id="s-end" aria-live="assertive">
+  <div class="inner">
+    <div class="eyebrow" id="e-eyebrow">Итог</div>
+    <h1 id="e-title">Стилист<br><em>от бога</em></h1>
+    <p class="lead" id="e-lead"></p>
+    <div class="code" id="e-code">GATTI10</div>
+    <p class="fine" id="e-fine">Покажи экран в бутике или назови код при заказе. Пример акции: приз и условия укажет магазин.</p>
+    <button class="btn light" id="again">Сыграть ещё</button>
+  </div>
+</section>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // погода → подсказка для каждого слота
+  const WEATHER = {
+    frost:  { ico: "❄️", temp: "−27°", desc: "ясно, сильный ветер", bg: "linear-gradient(135deg,#3b5a7a,#16263a)" },
+    snow:   { ico: "🌨️", temp: "−6°",  desc: "снегопад", bg: "linear-gradient(135deg,#8aa1b4,#4f6578)" },
+    rain:   { ico: "🌧️", temp: "+8°",  desc: "дождь, слякоть", bg: "linear-gradient(135deg,#6f7d86,#3d474f)" },
+    spring: { ico: "⛅",  temp: "+15°", desc: "облачно, свежо", bg: "linear-gradient(135deg,#9fb39a,#5f7a62)" },
+    summer: { ico: "☀️", temp: "+26°", desc: "солнце", bg: "linear-gradient(135deg,#e0a458,#c26a3c)" },
+  };
+
+  // гардероб — в рабочей версии здесь будут фото реальных вещей из бутика
+  const SLOTS = [
+    { key: "top", title: "Верхняя одежда", items: [
+      { e: "🧥", n: "Пуховик", ok: ["frost", "snow"] },
+      { e: "🧥", n: "Шерстяное пальто", ok: ["snow", "spring"] },
+      { e: "🥼", n: "Тренч", ok: ["rain", "spring"] },
+      { e: "👗", n: "Платье", ok: ["summer"] },
+    ]},
+    { key: "acc", title: "Аксессуар", items: [
+      { e: "🧣", n: "Шарф", ok: ["frost", "snow"] },
+      { e: "🧤", n: "Варежки", ok: ["frost"] },
+      { e: "☂️", n: "Зонт", ok: ["rain"] },
+      { e: "🕶️", n: "Очки", ok: ["summer", "spring"] },
+    ]},
+    { key: "shoes", title: "Обувь", items: [
+      { e: "👢", n: "Зимние сапоги", ok: ["frost", "snow"] },
+      { e: "🥾", n: "Ботинки", ok: ["rain", "spring", "snow"] },
+      { e: "👟", n: "Кроссовки", ok: ["spring", "summer"] },
+      { e: "👡", n: "Босоножки", ok: ["summer"] },
+    ]},
+  ];
+
+  const JOKES = {
+    frost: "При −27° это смело. Очень смело 🥶",
+    snow: "Снег оценит, ноги — нет",
+    rain: "Слякоть скажет спасибо… но не тебе",
+    spring: "Немного не по сезону",
+    summer: "Расплавишься, пока дойдёшь 🔥",
+  };
+
+  const ROUNDS = 3, TIME = 20, WIN = 7;
+  let order = [], round = 0, stars = 0, pick = {}, timerId = 0, t0 = 0, playing = false;
+
+  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+  function buildWardrobe() {
+    const ward = $("ward"); ward.innerHTML = "";
+    for (const s of SLOTS) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = `<div class="row-title">${s.title}</div>`;
+      const row = document.createElement("div"); row.className = "chips";
+      s.items.forEach((it, i) => {
+        const b = document.createElement("button");
+        b.className = "chip"; b.type = "button";
+        b.innerHTML = `<span>${it.e}</span><b>${it.n}</b>`;
+        b.setAttribute("aria-label", `${s.title}: ${it.n}`);
+        b.onclick = () => choose(s.key, i, row, b);
+        row.appendChild(b);
+      });
+      wrap.appendChild(row); ward.appendChild(wrap);
+    }
+  }
+
+  function choose(slot, i, row, btn) {
+    if (!playing) return;
+    pick[slot] = i;
+    row.querySelectorAll(".chip").forEach((c) => c.classList.remove("sel"));
+    btn.classList.add("sel");
+    const it = SLOTS.find((s) => s.key === slot).items[i];
+    const badge = $("badge-" + slot);
+    badge.classList.remove("on"); void badge.offsetWidth;
+    badge.querySelector("span").textContent = it.e;
+    badge.querySelector("small").textContent = it.n;
+    badge.classList.add("on");
+    navigator.vibrate?.(15);
+    $("done").disabled = Object.keys(pick).length < SLOTS.length;
+  }
+
+  function startRound() {
+    const w = WEATHER[order[round]];
+    $("weather").style.background = w.bg;
+    $("w-ico").textContent = w.ico; $("w-temp").textContent = w.temp; $("w-desc").textContent = w.desc;
+    $("round").textContent = `Образ ${round + 1} / ${ROUNDS}`;
+    pick = {}; $("done").disabled = true;
+    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("sel"));
+    document.querySelectorAll(".slot-badge").forEach((b) => b.classList.remove("on"));
+    playing = true; t0 = performance.now();
+    cancelAnimationFrame(timerId); tick();
+  }
+
+  function tick() {
+    const left = Math.max(0, 1 - (performance.now() - t0) / (TIME * 1000));
+    $("timer").style.transform = `scaleX(${left})`;
+    if (left <= 0) return endRound();
+    if (playing) timerId = requestAnimationFrame(tick);
+  }
+
+  function endRound() {
+    if (!playing) return;
+    playing = false; cancelAnimationFrame(timerId);
+    const wk = order[round];
+    let got = 0; const list = $("r-list"); list.innerHTML = "";
+    for (const s of SLOTS) {
+      const i = pick[s.key];
+      const it = i == null ? null : s.items[i];
+      const ok = !!it && it.ok.includes(wk);
+      if (ok) got++;
+      const row = document.createElement("div");
+      row.className = ok ? "ok" : "no";
+      row.innerHTML = it
+        ? `<span style="font-size:22px">${it.e}</span><span><b>${it.n}</b> — ${ok ? "в точку ✓" : JOKES[wk]}</span>`
+        : `<span style="font-size:22px">⏱️</span><span><b>${s.title}</b> — не успела выбрать</span>`;
+      list.appendChild(row);
+    }
+    stars += got; $("stars").textContent = `★ ${stars}`;
+    $("r-eyebrow").textContent = `Образ ${round + 1} из ${ROUNDS} · ${WEATHER[wk].temp}`;
+    $("r-title").textContent = got === 3 ? "Идеально ★★★" : `${got} из 3 ★`;
+    $("next").textContent = round + 1 < ROUNDS ? "Следующий прогноз" : "Итог";
+    $("s-round").classList.remove("hidden");
+  }
+
+  function next() {
+    $("s-round").classList.add("hidden");
+    round++;
+    if (round < ROUNDS) return startRound();
+    const win = stars >= WIN;
+    $("e-eyebrow").textContent = `Итог · ★ ${stars} из ${ROUNDS * 3}`;
+    $("e-title").innerHTML = win ? "Стилист<br><em>от бога</em>" : "Почти<br><em>стилист</em>";
+    $("e-lead").textContent = win
+      ? "Ты одеваешься по погоде лучше, чем синоптики её предсказывают. Держи подарок:"
+      : `Нужно ${WIN} звёзд для промокода. Ещё попытка — прогнозы будут другие.`;
+    $("e-code").style.display = win ? "" : "none";
+    $("e-fine").style.display = win ? "" : "none";
+    $("s-end").classList.remove("hidden");
+  }
+
+  function start() {
+    order = shuffle(Object.keys(WEATHER)).slice(0, ROUNDS);
+    round = 0; stars = 0; $("stars").textContent = "★ 0";
+    ["s-start", "s-end", "s-round"].forEach((id) => $(id).classList.add("hidden"));
+    startRound();
+  }
+
+  $("play").onclick = start; $("again").onclick = start; $("next").onclick = next; $("done").onclick = endRound;
+  buildWardrobe();
+})();
+</script>
+</body>
+</html>
