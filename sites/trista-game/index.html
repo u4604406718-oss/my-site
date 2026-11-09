@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Набери 300 — игра Триста Бариста</title>
+<meta name="theme-color" content="#f3e6d6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3e6d6;
+    --paper-2: #ead6bf;
+    --coffee: #3b2418;
+    --coffee-soft: #6b4a37;
+    --orange: #e8742c;
+    --orange-2: #f39a4f;
+    --cream: #fff8ef;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: var(--paper); overflow: hidden; overscroll-behavior: none; }
+  body {
+    font-family: "Manrope", system-ui, sans-serif; color: var(--coffee);
+    -webkit-font-smoothing: antialiased; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* HUD */
+  .hud {
+    position: fixed; left: 0; right: 0; top: 0; padding: max(14px, env(safe-area-inset-top)) 18px 0;
+    display: flex; align-items: center; justify-content: space-between; pointer-events: none; z-index: 2;
+  }
+  .brand { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+  .brand span { color: var(--orange); }
+  .score { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .score small { font-size: 12px; color: var(--coffee-soft); font-weight: 500; }
+  .lives { font-size: 18px; letter-spacing: 2px; min-width: 64px; text-align: right; }
+  .bar { position: fixed; left: 18px; right: 18px; top: calc(max(14px, env(safe-area-inset-top)) + 36px); height: 6px;
+    border-radius: 99px; background: rgba(59,36,24,.12); overflow: hidden; z-index: 2; pointer-events: none; }
+  .bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--orange), var(--orange-2)); border-radius: 99px; transition: width .25s cubic-bezier(.2,0,0,1); }
+
+  /* Screens */
+  .screen {
+    position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; padding: 32px 24px; text-align: center; background: radial-gradient(120% 80% at 50% 20%, var(--cream), var(--paper) 60%, var(--paper-2));
+    transition: opacity .45s cubic-bezier(.2,0,0,1), transform .45s cubic-bezier(.2,0,0,1);
+  }
+  .screen.hidden { opacity: 0; transform: scale(1.03); pointer-events: none; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--coffee-soft); }
+  h1 { font-family: "Unbounded", sans-serif; font-weight: 800; font-size: clamp(40px, 12vw, 72px); line-height: .95; letter-spacing: -.02em; }
+  h1 em { font-style: normal; color: var(--orange); }
+  .lead { font-size: 16px; line-height: 1.4; max-width: 30ch; color: var(--coffee-soft); }
+  .rules { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; font-size: 14px; }
+  .rules div { background: var(--cream); border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 18px -10px rgba(59,36,24,.35); }
+  .btn {
+    position: relative; overflow: hidden; border: 0; cursor: pointer; font: 700 16px "Manrope", sans-serif;
+    color: var(--cream); background: var(--coffee); border-radius: 999px; padding: 18px 34px; min-width: 220px;
+    box-shadow: 0 14px 30px -14px rgba(59,36,24,.7); transition: transform .2s cubic-bezier(.2,0,0,1);
+  }
+  .btn:active { transform: scale(.97); }
+  .btn::after { content: ""; position: absolute; inset: 0 auto 0 -40%; width: 35%; transform: skewX(-12deg);
+    background: rgba(255,255,255,.18); filter: blur(4px); animation: sheen 2.6s ease-in-out infinite; }
+  @keyframes sheen { 0%,60% { left: -40%; } 100% { left: 130%; } }
+  .ghost { background: transparent; color: var(--coffee); box-shadow: inset 0 0 0 1.5px var(--coffee); }
+  .ghost::after { display: none; }
+  .code {
+    font-family: "Unbounded", sans-serif; font-weight: 800; font-size: 28px; letter-spacing: .12em; padding: 16px 24px;
+    background: var(--cream); border: 2px dashed var(--orange); border-radius: 16px;
+  }
+  .fine { font-size: 12px; color: var(--coffee-soft); max-width: 32ch; line-height: 1.4; }
+  .credit { position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center;
+    font-size: 11px; color: var(--coffee-soft); z-index: 6; pointer-events: none; opacity: .8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn::after { animation: none; }
+    .screen, .bar i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Игровое поле: лови ингредиенты стаканом"></canvas>
+
+<div class="hud" aria-live="polite">
+  <div class="brand">Триста <span>Бариста</span></div>
+  <div class="score"><b id="score">0</b><small> / 300</small></div>
+  <div class="lives" id="lives" aria-label="Жизни">🧡🧡🧡</div>
+</div>
+<div class="bar"><i id="bar"></i></div>
+
+<section class="screen" id="start">
+  <div class="eyebrow">Кофейня · Улан-Удэ</div>
+  <h1>Набери <em>300</em></h1>
+  <p class="lead">Лови стаканом всё, из чего мы варим вкусные встречи. Набери 300 очков — и забери промокод.</p>
+  <div class="rules">
+    <div>🫘 🥛 🥐 🫐 &nbsp;+10</div>
+    <div>🌶️ &nbsp;—1 🧡</div>
+  </div>
+  <button class="btn" id="play">Играть</button>
+  <p class="fine">Двигай стакан пальцем или стрелками</p>
+</section>
+
+<section class="screen hidden" id="win" aria-live="assertive">
+  <div class="eyebrow">Латте готов ☕</div>
+  <h1>Ты набрала<br><em>300!</em></h1>
+  <p class="lead">Покажи этот экран бариста и получи подарок к заказу.</p>
+  <div class="code" id="promo">TRISTA300</div>
+  <p class="fine">Пример акции: приз и условия укажет кофейня.</p>
+  <button class="btn ghost" id="again-win">Сыграть ещё</button>
+</section>
+
+<section class="screen hidden" id="lose" aria-live="assertive">
+  <div class="eyebrow">Ой, перец в латте 🌶️</div>
+  <h1><em id="final">0</em><br>очков</h1>
+  <p class="lead">До промокода совсем чуть-чуть. Ещё попытка?</p>
+  <button class="btn" id="again-lose">Ещё раз</button>
+</section>
+
+<div class="credit">Игра: @ariela_ra</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const GOAL = 300, STEP = 10, LIVES = 3;
+  const GOOD = ["🫘", "🥛", "🥐", "🫐", "🫘"];
+  const BAD = "🌶️";
+
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    cup.w = Math.min(120, W * 0.28); cup.h = cup.w * 1.05;
+    cup.y = H - cup.h - Math.max(36, H * 0.06);
+    cup.x = Math.min(Math.max(cup.x || W / 2, cup.w / 2), W - cup.w / 2);
+  }
+
+  const cup = { x: 0, y: 0, w: 100, h: 105, target: 0, tilt: 0, fill: 0 };
+  let items = [], pops = [], leaves = [];
+  let score = 0, lives = LIVES, running = false, last = 0, spawnT = 0, elapsed = 0, shake = 0;
+
+  // осенние листья на фоне — коллекция «Осень 2026» у кофейни
+  for (let i = 0; i < 9; i++) leaves.push({ x: Math.random(), y: Math.random(), s: 14 + Math.random() * 14, v: 0.02 + Math.random() * 0.03, r: Math.random() * 6 });
+
+  function reset() {
+    items = []; pops = []; score = 0; lives = LIVES; elapsed = 0; spawnT = 0; cup.fill = 0;
+    cup.x = cup.target = W / 2; updateHud();
+  }
+
+  function updateHud() {
+    $("score").textContent = score;
+    $("lives").textContent = "🧡".repeat(lives) + "🤍".repeat(LIVES - lives);
+    $("bar").style.width = Math.min(100, (score / GOAL) * 100) + "%";
+  }
+
+  function spawn() {
+    const bad = Math.random() < Math.min(0.12 + elapsed / 120, 0.28);
+    const size = Math.min(54, Math.max(38, W * 0.1));
+    items.push({
+      e: bad ? BAD : GOOD[(Math.random() * GOOD.length) | 0], bad,
+      x: size / 2 + Math.random() * (W - size), y: -size, size,
+      vy: (H / 4.2) * (1 + elapsed / 45) * (0.85 + Math.random() * 0.3),
+      rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 3,
+    });
+  }
+
+  function drawBackground(t) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#fff8ef"); g.addColorStop(0.55, "#f3e6d6"); g.addColorStop(1, "#ead6bf");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 0.35; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (const l of leaves) {
+      if (!reduced) { l.y += l.v * 0.016; if (l.y > 1.1) { l.y = -0.1; l.x = Math.random(); } }
+      ctx.save();
+      ctx.translate(l.x * W + Math.sin(t / 1400 + l.r) * 18, l.y * H);
+      ctx.rotate(Math.sin(t / 1800 + l.r) * 0.6);
+      ctx.font = `${l.s}px serif`; ctx.fillText("🍂", 0, 0);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    // большая «300» водяным знаком
+    ctx.font = `800 ${Math.min(W * 0.55, 320)}px Unbounded, sans-serif`;
+    ctx.fillStyle = "rgba(232,116,44,0.07)"; ctx.fillText("300", W / 2, H * 0.52);
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  function drawCup() {
+    const { x, y, w, h } = cup;
+    ctx.save();
+    ctx.translate(x, y + h / 2); ctx.rotate(cup.tilt); ctx.translate(-x, -(y + h / 2));
+    // тень
+    ctx.fillStyle = "rgba(59,36,24,.18)";
+    ctx.beginPath(); ctx.ellipse(x, y + h + 10, w * 0.42, 7, 0, 0, Math.PI * 2); ctx.fill();
+    // корпус (трапеция)
+    const top = w, bottom = w * 0.74;
+    ctx.beginPath();
+    ctx.moveTo(x - top / 2, y + h * 0.12); ctx.lineTo(x + top / 2, y + h * 0.12);
+    ctx.lineTo(x + bottom / 2, y + h); ctx.lineTo(x - bottom / 2, y + h); ctx.closePath();
+    ctx.fillStyle = "#fff8ef"; ctx.fill();
+    // кофе внутри поднимается вместе со счётом
+    ctx.save(); ctx.clip();
+    const level = y + h - (h * 0.86) * cup.fill;
+    const cg = ctx.createLinearGradient(0, level, 0, y + h);
+    cg.addColorStop(0, "#c98a56"); cg.addColorStop(1, "#5a3523");
+    ctx.fillStyle = cg; ctx.fillRect(x - w, level, w * 2, h);
+    ctx.restore();
+    ctx.lineWidth = 2.5; ctx.strokeStyle = "#3b2418"; ctx.stroke();
+    // рукав-«300»
+    ctx.fillStyle = "#e8742c";
+    ctx.beginPath();
+    ctx.moveTo(x - w * 0.47, y + h * 0.4); ctx.lineTo(x + w * 0.47, y + h * 0.4);
+    ctx.lineTo(x + w * 0.42, y + h * 0.68); ctx.lineTo(x - w * 0.42, y + h * 0.68); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#fff8ef"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `800 ${w * 0.2}px Unbounded, sans-serif`; ctx.fillText("300", x, y + h * 0.545);
+    // крышка
+    ctx.fillStyle = "#3b2418"; roundRect(x - w * 0.55, y, w * 1.1, h * 0.14, 6); ctx.fill();
+    ctx.restore();
+  }
+
+  function burst(x, y, good) {
+    const n = reduced ? 0 : 10;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, s = 60 + Math.random() * 140;
+      pops.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 80, life: 0.6, c: good ? (i % 2 ? "#e8742c" : "#c98a56") : "#d23b2a" });
+    }
+    pops.push({ x, y: y - 10, vx: 0, vy: -60, life: 0.8, text: good ? "+10" : "−🧡" });
+  }
+
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000 || 0, 0.05); last = now;
+    if (shake > 0) shake -= dt;
+    ctx.save();
+    if (shake > 0 && !reduced) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+    drawBackground(now);
+
+    if (running) {
+      elapsed += dt;
+      spawnT -= dt;
+      if (spawnT <= 0) { spawn(); spawnT = Math.max(0.38, 0.9 - elapsed / 60); }
+      // стакан догоняет палец — пружинка
+      const prev = cup.x;
+      cup.x += (cup.target - cup.x) * Math.min(1, dt * 14);
+      cup.tilt += (((cup.x - prev) / Math.max(dt, 0.001)) * 0.00025 - cup.tilt) * Math.min(1, dt * 10);
+      cup.tilt = Math.max(-0.25, Math.min(0.25, cup.tilt));
+    }
+    cup.fill += (Math.min(score / GOAL, 1) - cup.fill) * Math.min(1, dt * 6);
+
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      if (running) { it.y += it.vy * dt; it.rot += it.vr * dt; }
+      ctx.save(); ctx.translate(it.x, it.y);
+      // мягкая «подложка», чтобы светлые предметы (молоко, круассан) читались на кремовом фоне
+      ctx.fillStyle = it.bad ? "rgba(210,59,42,.14)" : "rgba(255,255,255,.75)";
+      ctx.shadowColor = "rgba(59,36,24,.25)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+      ctx.beginPath(); ctx.arc(0, 0, it.size * 0.62, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowColor = "transparent";
+      ctx.rotate(reduced ? 0 : it.rot);
+      ctx.font = `${it.size}px serif`; ctx.fillText(it.e, 0, 0); ctx.restore();
+
+      const inX = Math.abs(it.x - cup.x) < cup.w * 0.5;
+      const inY = it.y > cup.y && it.y < cup.y + cup.h * 0.5;
+      if (running && inX && inY) {
+        items.splice(i, 1);
+        if (it.bad) { lives--; shake = 0.3; burst(it.x, cup.y, false); navigator.vibrate?.(80); }
+        else { score += STEP; burst(it.x, cup.y, true); }
+        updateHud();
+        if (score >= GOAL) return finish(true);
+        if (lives <= 0) return finish(false);
+      } else if (it.y > H + it.size) items.splice(i, 1);
+    }
+
+    drawCup();
+
+    for (let i = pops.length - 1; i >= 0; i--) {
+      const p = pops[i]; p.life -= dt; if (p.life <= 0) { pops.splice(i, 1); continue; }
+      p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt;
+      ctx.globalAlpha = Math.max(0, p.life / 0.8);
+      if (p.text) { ctx.font = `800 20px Unbounded, sans-serif`; ctx.fillStyle = "#3b2418"; ctx.fillText(p.text, p.x, p.y); }
+      else { ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+    ctx.restore();
+    requestAnimationFrame(frame);
+  }
+
+  function finish(win) {
+    running = false;
+    ctx.restore();
+    if (!win) $("final").textContent = score;
+    $(win ? "win" : "lose").classList.remove("hidden");
+    requestAnimationFrame(frame);
+  }
+
+  function start() {
+    reset();
+    ["start", "win", "lose"].forEach((id) => $(id).classList.add("hidden"));
+    running = true;
+  }
+
+  // управление: палец/мышь — стакан под пальцем, клавиатура — стрелки
+  const moveTo = (clientX) => { cup.target = Math.min(Math.max(clientX, cup.w / 2), W - cup.w / 2); };
+  canvas.addEventListener("pointerdown", (e) => moveTo(e.clientX));
+  addEventListener("pointermove", (e) => { if (running && (e.pointerType !== "mouse" || e.buttons || true)) moveTo(e.clientX); });
+  addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") moveTo(cup.target - W * 0.12);
+    if (e.key === "ArrowRight") moveTo(cup.target + W * 0.12);
+    if ((e.key === " " || e.key === "Enter") && !running) start();
+  });
+  $("play").onclick = start; $("again-win").onclick = start; $("again-lose").onclick = start;
+
+  addEventListener("resize", resize);
+  resize(); reset();
+  requestAnimationFrame((t) => { last = t; requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
