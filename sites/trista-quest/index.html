@@ -202,7 +202,7 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
       <div class="lbl" id="combo"></div>
     </div>
     <div class="prog" id="prog"><i id="bar"></i><em id="pctmark"></em></div>
-    <div class="timer" id="timer">60</div>
+    <div class="timer" id="timer">40</div>
     <button class="snd" id="snd" aria-label="Звук">🔊</button>
   </div>
 
@@ -266,21 +266,21 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
    НАСТРОЙКИ — всё, что можно менять без программиста
    ============================================================ */
 const CONFIG = {
-  duration: 60,            // секунд на игру
+  duration: 40,            // секунд на игру
   target: 300,             // очков для скидки
   discount: 10,            // % скидки
   friendBonus: 5,          // % каждому, если пришли вдвоём
   couponFor: 'на напиток или десерт',
   oneCouponPerPhone: true, // один талон на телефон
-  points: { base: 3, speedMax: 3, comboStep: 7, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
+  points: { base: 5, speedMax: 5, comboStep: 5, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
   pace:   { spawnFrom: 1.5, spawnTo: 0.95, patienceFrom: 7, patienceTo: 4.6, maxFrom: 3, maxTo: 5 },
   hard: {                  // сложности
-    doubleFrom: 5, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 4,   // двойные заказы
-    vipFrom: 10, vipChance: 0.15, vipPatience: 0.6, vipMult: 2,                // золотой гость
-    shuffleAt: [15, 30, 45],                                                       // когда переставляется полка
-    rushLast: 15, rushPace: 0.75                                               // финальный рывок
+    doubleFrom: 4, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 4,   // двойные заказы
+    vipFrom: 8, vipChance: 0.15, vipPatience: 0.6, vipMult: 2,                // золотой гость
+    shuffleAt: [12, 24, 33],                                                       // когда переставляется полка
+    rushLast: 10, rushPace: 0.75                                               // финальный рывок
   },
-  pepper: { startAt: 4, everyMin: 2.8, everyMax: 5.5, showFor: 1.9, twoFrom: 25 }, // ловушки на полке; с twoFrom секунд их может быть две сразу
+  pepper: { startAt: 3, everyMin: 2.5, everyMax: 5, showFor: 1.9, twoFrom: 16 }, // ловушки на полке; с twoFrom секунд их может быть две сразу
   speak: false,            // озвучивать «Ой, остро!» голосом телефона (пока нет своей записи)
   dayHours: [9, 17],       // с 9 до 17 по Улан-Удэ — дневная сцена
   tzOffset: 8,             // Улан-Удэ, UTC+8
