@@ -76,15 +76,16 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
 .snd{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.25);font-size:16px}
 
 /* ---------- полка ---------- */
-#shelf{position:absolute;left:0;right:0;bottom:0;padding:26px 8px calc(12px + var(--sab));display:flex;gap:6px;justify-content:center;
+#shelf{position:absolute;left:0;right:0;bottom:0;padding:26px 8px calc(12px + var(--sab));display:flex;flex-wrap:wrap;gap:10px 6px;justify-content:center;
   background:linear-gradient(transparent,rgba(20,16,12,.9) 26%,#14100c);z-index:5;transform:translateY(110%);transition:.55s cubic-bezier(.2,.8,.2,1)}
 #shelf.on{transform:none}
-.item{flex:1;max-width:96px;min-width:0;padding:8px 2px 7px;border-radius:18px;background:linear-gradient(#fffaf1,#efe2cc);color:#3a2c1c;
+.item{flex:1 1 17%;max-width:96px;min-width:0;padding:8px 2px 7px;border-radius:18px;background:linear-gradient(#fffaf1,#efe2cc);color:#3a2c1c;
   box-shadow:0 5px 0 #b9a383,0 10px 18px rgba(0,0,0,.4);transition:transform .08s,box-shadow .08s;position:relative}
 .item:active,.item.down{transform:translateY(4px);box-shadow:0 1px 0 #b9a383,0 4px 10px rgba(0,0,0,.4)}
 .item .pic{height:54px;display:grid;place-items:center}
 .item img{max-width:86%;max-height:54px;object-fit:contain;pointer-events:none;transition:transform .2s}
 .item span{display:block;font:700 9.5px/1.15 Manrope;margin-top:5px;height:22px;overflow:hidden;letter-spacing:-.01em}
+.item.fresh::before{content:"new";position:absolute;right:-4px;top:-8px;background:var(--teal);color:#fff;font:800 9px Manrope;padding:3px 6px;border-radius:99px;z-index:2}
 .item.pepper{background:linear-gradient(#ffe2d6,#ffbfa9);box-shadow:0 5px 0 #c9705a,0 10px 18px rgba(0,0,0,.4)}
 .item.garlic{background:linear-gradient(#f1f4d4,#d5dc9a);box-shadow:0 5px 0 #8f9a4a,0 10px 18px rgba(0,0,0,.4)}
 .guest.stinky .person{filter:drop-shadow(0 0 14px rgba(160,190,50,.95)) hue-rotate(40deg) saturate(1.2)}
@@ -272,12 +273,13 @@ const CONFIG = {
   friendBonus: 5,          // % каждому, если пришли вдвоём
   couponFor: 'на напиток или десерт',
   oneCouponPerPhone: true, // один талон на телефон
-  points: { base: 5, speedMax: 5, comboStep: 5, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
+  points: { base: 4, speedMax: 4, comboStep: 6, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
   pace:   { spawnFrom: 1.5, spawnTo: 0.95, patienceFrom: 7, patienceTo: 4.6, maxFrom: 3, maxTo: 5 },
   hard: {                  // сложности
     doubleFrom: 4, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 4,   // двойные заказы
     vipFrom: 8, vipChance: 0.15, vipPatience: 0.6, vipMult: 2,                // золотой гость
     shuffleAt: [12, 24, 33],                                                       // когда переставляется полка
+    expandAt: 20,                                                              // когда в меню появляются новинки
     rushLast: 10, rushPace: 0.75                                               // финальный рывок
   },
   pepper: { startAt: 3, everyMin: 2.5, everyMax: 5, showFor: 1.9, twoFrom: 16 }, // ловушки на полке; с twoFrom секунд их может быть две сразу
@@ -306,6 +308,12 @@ const TRAPS = [
   { id: 'pepper', img: 'assets/pepper.webp', label: 'Перчик?',   say: ['Ой, остро!', 'Ай, горячо!', 'Ой, перец!'], flash: 'rgba(226,70,40,.6)' },
   { id: 'garlic', img: emojiImg('🧄'),       label: 'Чесночок?', say: ['Фу, чеснок!', 'Ой, чеснок!', 'Фу-у-у!'],   flash: 'rgba(150,170,60,.6)' }
 ];
+const EXTRA = [              // новинки, которые появляются в середине игры (пока эмодзи вместо картинок)
+  { id: 'croissant', name: 'Круассан',       img: emojiImg('🥐') },
+  { id: 'bumble',    name: 'Бамбл апельсин', img: emojiImg('🍊') }
+];
+const srcOf = m => m.img || `assets/${m.id}.webp`;
+let ACTIVE = MENU.slice();
 function speak(text) {
   if (!CONFIG.speak || Snd.muted || Snd.voices.length || !('speechSynthesis' in window)) return;
   try {
@@ -441,13 +449,27 @@ const G = { state: 'title', t: 0, score: 0, combo: 0, bestCombo: 0, served: 0, s
             spawnT: 0, pepperT: 0, guests: [], paused: false, lastTick: -1, tutorial: true };
 const slots = [];
 
-MENU.forEach((m, i) => {
-  const b = document.createElement('button'); b.className = 'item';
-  b.innerHTML = `<div class="pic"><img src="assets/${m.id}.webp" alt=""></div><span>${m.name}</span>`;
+function addSlot(m) {
+  const i = slots.length, b = document.createElement('button'); b.className = 'item';
+  b.innerHTML = `<div class="pic"><img src="${srcOf(m)}" alt=""></div><span>${m.name}</span>`;
   b.addEventListener('pointerdown', e => { e.preventDefault(); tapSlot(i); });
   el.shelf.appendChild(b);
   slots.push({ btn: b, item: m, pepperLeft: 0 });
-});
+  return b;
+}
+MENU.forEach(addSlot);
+function expandMenu() {
+  G.expanded = true; ACTIVE = MENU.concat(EXTRA);
+  EXTRA.forEach((m, k) => {
+    const b = addSlot(m); b.classList.add('fresh');
+    if (!reduced) b.animate([{ transform: 'translateY(60px) scale(.5)', opacity: 0 }, { transform: 'translateY(-8px) scale(1.1)', opacity: 1, offset: .7 }, { transform: 'none' }], { duration: 420, delay: k * 120, fill: 'backwards', easing: 'ease-out' });
+  });
+  toast('Новинки в меню! ✨'); Snd.unlock();
+}
+function resetMenu() {
+  ACTIVE = MENU.slice();
+  while (slots.length > MENU.length) slots.pop().btn.remove();
+}
 
 function setScore(v) {
   G.score = Math.max(0, Math.round(v));
@@ -469,11 +491,11 @@ function spawn() {
   const usedImg = G.guests.map(g => g.img);
   const img = pick(GUEST_IMAGES.filter(u => !usedImg.includes(u)));
   const wanted = [].concat(...G.guests.filter(g => g.state === 'wait').map(g => g.need));
-  let pool = MENU.filter(m => !wanted.includes(m.id)); if (!pool.length) pool = MENU;
+  let pool = ACTIVE.filter(m => !wanted.includes(m.id)); if (!pool.length) pool = ACTIVE;
   const H = CONFIG.hard, r = Math.random();
   let wants, vip = false;
   if (G.tutorial) wants = [MENU[0]];
-  else if (G.t > H.doubleFrom && r < H.doubleChance) { const a = pick(pool); wants = [a, pick(MENU.filter(m => m.id !== a.id))]; }
+  else if (G.t > H.doubleFrom && r < H.doubleChance) { const a = pick(pool); wants = [a, pick(ACTIVE.filter(m => m.id !== a.id))]; }
   else { wants = [pick(pool)]; vip = G.t > H.vipFrom && r > 1 - H.vipChance && !G.guests.some(g => g.vip); }
   const dbl = wants.length > 1;
   const p = Math.min(G.t / CONFIG.duration, 1);
@@ -481,7 +503,7 @@ function spawn() {
   const [x, y] = SPOTS[spot];
   const node = document.createElement('div'); node.className = 'guest' + (vip ? ' vip' : '') + (dbl ? ' double' : '');
   node.style.cssText = `left:${x}px;top:${y}px;z-index:${y}`;
-  const pics = wants.map(w => `<img data-id="${w.id}" src="assets/${w.id}.webp" alt="${w.name}">`).join('');
+  const pics = wants.map(w => `<img data-id="${w.id}" src="${srcOf(w)}" alt="${w.name}">`).join('');
   const meter = dbl ? '<i class="bar"><b></b></i>' : '<svg viewBox="0 0 158 158"><circle class="track" cx="79" cy="79" r="70"/><circle class="ring" cx="79" cy="79" r="70"/></svg>';
   node.innerHTML = `<div class="inner"><div class="bubble">${meter}${pics}${vip ? '<em class="star">⭐</em>' : ''}</div><img class="person" src="${img}" alt=""><div class="shadow"></div></div>`;
   el.guests.appendChild(node);
@@ -557,7 +579,7 @@ function tapSlot(i) {
   if (last && g.wants.length > 1) pts += Math.round(H.doubleBonus * mult());
   if (G.tutorial) { G.tutorial = false; G.started = true; el.hand.style.display = el.hint.style.display = 'none'; G.spawnT = 0.5; }
   const pic = g.bubble.querySelector(`img[data-id="${id}"]:not(.claimed)`); pic.classList.add('claimed');
-  fly(`assets/${id}.webp`, centerOf(s.btn.querySelector('img')), centerOf(pic), () => {
+  fly(srcOf(s.item), centerOf(s.btn.querySelector('img')), centerOf(pic), () => {
     g.flights--; pic.classList.add('done');
     Snd.serve(G.combo); setScore(G.score + pts); showCombo();
     popText('+' + pts, centerOf(g.bubble), 'good');
@@ -605,7 +627,7 @@ function setPepper(s, on) {
   setTimeout(() => {
     s.btn.classList.toggle('pepper', !!trap && trap.id === 'pepper');
     s.btn.classList.toggle('garlic', !!trap && trap.id === 'garlic');
-    s.btn.querySelector('img').src = trap ? trap.img : `assets/${s.item.id}.webp`;
+    s.btn.querySelector('img').src = trap ? trap.img : srcOf(s.item);
     s.btn.querySelector('span').textContent = trap ? trap.label : s.item.name;
   }, 130);
 }
@@ -638,6 +660,7 @@ function loop(now) {
       spawn(); G.spawnT = lerp(pc.spawnFrom, pc.spawnTo, p) * rnd(0.8, 1.2) * (G.rush ? CONFIG.hard.rushPace : 1);
     }
     const H = CONFIG.hard;
+    if (!G.expanded && G.t >= H.expandAt) expandMenu();
     if (G.shuffleI < H.shuffleAt.length && G.t >= H.shuffleAt[G.shuffleI]) { G.shuffleI++; shuffleShelf(); }
     if (!G.rush && G.t >= CONFIG.duration - H.rushLast) { G.rush = true; toast('Час пик! 🔥'); [440, 554, 659].forEach((f, i) => Snd.tone(f, 0.14, { at: i * 0.08, type: 'square', vol: 0.06 })); }
     // перчик на полке
@@ -672,8 +695,8 @@ requestAnimationFrame(t => { prev = t; loop(t); });
 /* ---------- старт / финиш ---------- */
 function startGame(first) {
   Object.assign(G, { state: 'play', t: 0, combo: 0, bestCombo: 0, served: 0, unlocked: false, started: !first, tutorial: first,
-                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, missed: 0, traps: 0, pepperT: rnd(1, 3), lastTick: -1, paused: false });
-  G.guests.forEach(g => g.node.remove()); G.guests = [];
+                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, expanded: false, missed: 0, traps: 0, pepperT: rnd(1, 3), lastTick: -1, paused: false });
+  G.guests.forEach(g => g.node.remove()); G.guests = []; resetMenu();
   slots.forEach(s => { if (s.trap) setPepper(s, false); s.pepperLeft = 0; });
   G.score = 0; setScore(0); showCombo();
   el.timer.textContent = CONFIG.duration; el.timer.classList.remove('low');
