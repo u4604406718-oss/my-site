@@ -128,6 +128,7 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
 .big small{font:700 16px Manrope;color:var(--muted);letter-spacing:0}
 .stats{display:flex;justify-content:center;gap:22px;margin:14px 0 4px;font-size:12px;color:var(--muted)}
 .stats b{display:block;font:800 18px Unbounded;color:var(--ink);margin-bottom:2px}
+.lost{margin-top:8px;font-size:12px;color:var(--muted)}
 .need{display:inline-block;margin-top:8px;padding:8px 14px;border-radius:99px;background:rgba(234,169,63,.14);color:#ffd98a;font:700 14px Manrope}
 #pause{position:absolute;inset:0;z-index:20;display:none;place-items:center;background:rgba(13,11,9,.8);backdrop-filter:blur(8px)}
 #pause.on{display:grid}
@@ -271,10 +272,10 @@ const CONFIG = {
   friendBonus: 5,          // % каждому, если пришли вдвоём
   couponFor: 'на напиток или десерт',
   oneCouponPerPhone: true, // один талон на телефон
-  points: { base: 3, speedMax: 2, comboStep: 8, comboMultMax: 2, timeout: -10, wrong: -6, pepper: -25 },
+  points: { base: 3, speedMax: 3, comboStep: 7, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
   pace:   { spawnFrom: 1.5, spawnTo: 0.95, patienceFrom: 7, patienceTo: 4.6, maxFrom: 3, maxTo: 5 },
   hard: {                  // сложности
-    doubleFrom: 5, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 3,   // двойные заказы
+    doubleFrom: 5, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 4,   // двойные заказы
     vipFrom: 10, vipChance: 0.15, vipPatience: 0.6, vipMult: 2,                // золотой гость
     shuffleAt: [15, 30, 45],                                                       // когда переставляется полка
     rushLast: 15, rushPace: 0.75                                               // финальный рывок
@@ -583,7 +584,7 @@ function shuffleShelf() {
 function pepperHit(s) {
   const trap = s.trap || TRAPS[0], text = pick(trap.say);
   s.pepperLeft = 0; setPepper(s, false);
-  G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.pepper);
+  G.traps++; G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.pepper);
   Snd.spicy(); speak(text); shake(); if (navigator.vibrate) navigator.vibrate(70);
   el.flash.style.background = `radial-gradient(circle at 50% 55%,transparent 30%,${trap.flash})`;
   el.flash.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 0 }], { duration: 480 });
@@ -658,7 +659,7 @@ function loop(now) {
     g.node.classList.toggle('warn', f < 0.55 && f >= 0.28);
     g.node.classList.toggle('hurry', f < 0.28);
     if (g.left <= 0) {
-      G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.timeout); Snd.miss();
+      G.missed++; G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.timeout); Snd.miss();
       popText(CONFIG.points.timeout, centerOf(g.bubble), 'bad');
       g.node.classList.remove('hurry');
       g.bubble.animate([{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 200, fill: 'forwards' });
@@ -671,7 +672,7 @@ requestAnimationFrame(t => { prev = t; loop(t); });
 /* ---------- старт / финиш ---------- */
 function startGame(first) {
   Object.assign(G, { state: 'play', t: 0, combo: 0, bestCombo: 0, served: 0, unlocked: false, started: !first, tutorial: first,
-                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, pepperT: rnd(1, 3), lastTick: -1, paused: false });
+                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, missed: 0, traps: 0, pepperT: rnd(1, 3), lastTick: -1, paused: false });
   G.guests.forEach(g => g.node.remove()); G.guests = [];
   slots.forEach(s => { if (s.trap) setPepper(s, false); s.pepperLeft = 0; });
   G.score = 0; setScore(0); showCombo();
@@ -706,6 +707,7 @@ function finish() {
     main.textContent = 'Ещё раз'; main.onclick = () => startGame(false);
     alt.style.display = 'none';
   }
+  msg.innerHTML += `<div class="lost">ушло гостей: ${G.missed} · ловушек: ${G.traps}</div>`;
   setTimeout(() => { el.shelf.classList.remove('on'); el.end.classList.add('on'); countUp($('#endScore'), G.score); }, 500);
 }
 function plural(n, a, b, c) { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; }
