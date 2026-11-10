@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#17130f">
+<title>Час пик в Триста — мини-игра</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#17130f; --ink:#f6ecdc; --muted:#b9a88f; --teal:#4fa392; --amber:#eaa93f; --red:#e2553f;
+  --card:rgba(28,23,18,.86); --line:rgba(246,236,220,.14);
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0d0b09;color:var(--ink);font-family:Manrope,system-ui,sans-serif;overflow:hidden;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
+
+#app{position:relative;height:100%;max-width:520px;margin:0 auto;background:radial-gradient(120% 80% at 50% 30%,#2a231b 0%,var(--bg) 60%,#0f0c0a 100%);overflow:hidden}
+#view{position:absolute;inset:0;perspective:1400px;overflow:hidden}
+#tilt{position:absolute;inset:0;transform-origin:50% 60%}
+#world{position:absolute;left:0;top:0;width:1086px;height:1448px;transform-origin:0 0;will-change:transform}
+#world>img.scene{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#guests{position:absolute;inset:0}
+
+/* ---------- гости ---------- */
+.guest{position:absolute;transform:translate(-50%,-100%);pointer-events:none}
+.guest .inner{display:flex;flex-direction:column;align-items:center;transform-origin:50% 100%}
+.guest .person{height:250px;display:block;filter:drop-shadow(0 6px 5px rgba(0,0,0,.35))}
+.guest .shadow{position:absolute;left:50%;bottom:-8px;width:120px;height:30px;margin-left:-60px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.42),transparent);z-index:-1}
+.bubble{position:relative;width:150px;height:150px;margin-bottom:14px;border-radius:50%;background:#fffaf1;
+  box-shadow:0 10px 24px rgba(0,0,0,.45);display:grid;place-items:center;transform-origin:50% 100%}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-14px;margin-left:-13px;border:13px solid transparent;border-top-color:#fffaf1;border-bottom:0}
+.bubble img{width:104px;height:104px;object-fit:contain;position:relative;z-index:1}
+.bubble svg{position:absolute;inset:-4px;width:158px;height:158px;transform:rotate(-90deg)}
+.bubble circle{fill:none;stroke-width:9}
+.bubble .track{stroke:rgba(60,45,30,.12)}
+.bubble .ring{stroke:var(--teal);stroke-linecap:round;stroke-dasharray:440;transition:stroke .3s}
+.guest.warn .ring{stroke:var(--amber)}
+.guest.hurry .ring{stroke:var(--red)}
+.guest.hurry .inner{animation:hurry .45s ease-in-out infinite}
+.guest.spicy .person{filter:drop-shadow(0 0 14px rgba(255,70,40,.95)) saturate(1.5) hue-rotate(-12deg)}
+@keyframes hurry{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+.say{position:absolute;left:50%;top:-58px;transform:translateX(-50%);white-space:nowrap;background:var(--red);color:#fff;
+  font:800 34px Unbounded,sans-serif;padding:10px 20px;border-radius:999px;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;left:0;right:0;top:0;padding:calc(10px + var(--sat)) 14px 12px;display:flex;gap:12px;align-items:center;
+  background:linear-gradient(#14100c 0%,rgba(20,16,12,.82) 70%,transparent);z-index:5;opacity:0;transform:translateY(-100%);transition:.5s cubic-bezier(.2,.8,.2,1)}
+#hud.on{opacity:1;transform:none}
+.scorebox{min-width:92px}
+.scorebox .n{font:800 26px/1 Unbounded,sans-serif;font-variant-numeric:tabular-nums}
+.scorebox .n small{font:700 12px Manrope;color:var(--muted);margin-left:3px}
+.scorebox .lbl{font-size:11px;color:var(--muted);margin-top:3px;height:14px}
+.scorebox .lbl b{color:var(--amber)}
+.prog{flex:1;position:relative;height:12px;border-radius:99px;background:rgba(246,236,220,.12)}
+.prog i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--amber));transition:width .35s cubic-bezier(.2,.8,.2,1)}
+.prog em{position:absolute;right:-2px;top:-22px;font:800 11px Unbounded;font-style:normal;color:var(--amber)}
+.prog.done i{background:linear-gradient(90deg,var(--amber),#ffd98a);box-shadow:0 0 14px rgba(234,169,63,.7)}
+.timer{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:800 17px Unbounded;font-variant-numeric:tabular-nums;
+  border:2px solid var(--line);background:rgba(0,0,0,.25)}
+.timer.low{border-color:var(--red);color:#ffb3a6;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.snd{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.25);font-size:16px}
+
+/* ---------- полка ---------- */
+#shelf{position:absolute;left:0;right:0;bottom:0;padding:26px 8px calc(12px + var(--sab));display:flex;gap:6px;justify-content:center;
+  background:linear-gradient(transparent,rgba(20,16,12,.9) 26%,#14100c);z-index:5;transform:translateY(110%);transition:.55s cubic-bezier(.2,.8,.2,1)}
+#shelf.on{transform:none}
+.item{flex:1;max-width:96px;min-width:0;padding:8px 2px 7px;border-radius:18px;background:linear-gradient(#fffaf1,#efe2cc);color:#3a2c1c;
+  box-shadow:0 5px 0 #b9a383,0 10px 18px rgba(0,0,0,.4);transition:transform .08s,box-shadow .08s;position:relative}
+.item:active,.item.down{transform:translateY(4px);box-shadow:0 1px 0 #b9a383,0 4px 10px rgba(0,0,0,.4)}
+.item .pic{height:54px;display:grid;place-items:center}
+.item img{max-width:86%;max-height:54px;object-fit:contain;pointer-events:none;transition:transform .2s}
+.item span{display:block;font:700 9.5px/1.15 Manrope;margin-top:5px;height:22px;overflow:hidden;letter-spacing:-.01em}
+.item.pepper{background:linear-gradient(#ffe2d6,#ffbfa9);box-shadow:0 5px 0 #c9705a,0 10px 18px rgba(0,0,0,.4)}
+.item.flip{animation:flip .28s ease}
+.item.nope{animation:nope .3s}
+@keyframes flip{50%{transform:rotateY(90deg)}}
+@keyframes nope{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+#hand{position:absolute;z-index:6;font-size:40px;pointer-events:none;display:none;animation:hand .7s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+#hint{position:absolute;z-index:6;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--amber);color:#2a1d0a;font:800 14px Manrope;
+  padding:9px 16px;border-radius:99px;display:none;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+@keyframes hand{50%{transform:translateY(-12px)}}
+
+/* ---------- эффекты ---------- */
+#fx{position:absolute;inset:0;pointer-events:none;z-index:7;overflow:hidden}
+.fly{position:absolute;left:0;top:0;width:58px;height:58px;object-fit:contain;margin:-29px 0 0 -29px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.4))}
+.pop{position:absolute;font:800 20px Unbounded;transform:translate(-50%,-50%);text-shadow:0 2px 8px rgba(0,0,0,.7);white-space:nowrap}
+.pop.good{color:#ffe7a8}.pop.bad{color:#ff9a8a}
+#flash{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 55%,transparent 30%,rgba(226,70,40,.6))}
+#toast{position:absolute;left:50%;top:32%;z-index:8;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;text-align:center;white-space:nowrap;
+  font:800 24px Unbounded;color:#2a1d0a;background:linear-gradient(#ffd98a,var(--amber));padding:14px 22px;border-radius:22px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.bean{position:absolute;top:-20px;width:12px;height:17px;border-radius:50%;background:linear-gradient(120deg,#8a5a34,#4a2c17)}
+
+/* ---------- экраны ---------- */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:10;padding:26px 22px calc(22px + var(--sab));background:var(--card);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);border-radius:28px 28px 0 0;
+  transform:translateY(105%);transition:transform .6s cubic-bezier(.2,.8,.2,1);text-align:center}
+.sheet.on{transform:none}
+.eyebrow{font:700 11px Manrope;letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
+.sheet h1{font-size:30px;line-height:1.05;margin:10px 0 12px;font-weight:800;letter-spacing:-.02em}
+.sheet h1 b{color:var(--amber)}
+.sheet p{color:var(--muted);font-size:15px;line-height:1.45;max-width:340px;margin:0 auto}
+.sheet p b{color:var(--ink)}
+.btn{display:block;width:100%;margin-top:18px;padding:17px 20px;border-radius:18px;font:800 17px Unbounded;color:#2a1d0a;
+  background:linear-gradient(#ffd98a,var(--amber));box-shadow:0 5px 0 #a8741f,0 14px 30px rgba(234,169,63,.25);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #a8741f}
+.btn.ghost{background:none;box-shadow:none;color:var(--ink);border:1px solid var(--line);font:700 14px Manrope;padding:14px;margin-top:10px}
+.btn.ghost:active{transform:scale(.98)}
+.credit{margin-top:14px;font-size:11px;color:rgba(185,168,143,.6)}
+.big{font:800 68px/1 Unbounded;font-variant-numeric:tabular-nums;margin:8px 0 2px;letter-spacing:-.03em}
+.big small{font:700 16px Manrope;color:var(--muted);letter-spacing:0}
+.stats{display:flex;justify-content:center;gap:22px;margin:14px 0 4px;font-size:12px;color:var(--muted)}
+.stats b{display:block;font:800 18px Unbounded;color:var(--ink);margin-bottom:2px}
+.need{display:inline-block;margin-top:8px;padding:8px 14px;border-radius:99px;background:rgba(234,169,63,.14);color:#ffd98a;font:700 14px Manrope}
+#pause{position:absolute;inset:0;z-index:20;display:none;place-items:center;background:rgba(13,11,9,.8);backdrop-filter:blur(8px)}
+#pause.on{display:grid}
+#pause div{text-align:center;padding:24px;width:min(320px,86%)}
+
+/* ---------- талон ---------- */
+#coupon{position:absolute;inset:0;z-index:15;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  padding:calc(16px + var(--sat)) 20px calc(16px + var(--sab));background:rgba(13,11,9,.94);backdrop-filter:blur(10px)}
+#coupon.on{display:flex}
+.ticket{width:100%;max-width:360px;border-radius:26px;overflow:hidden;background:#fbf3e4;color:#2b2016;box-shadow:0 30px 70px rgba(0,0,0,.6);position:relative}
+.ticket .top{padding:18px 20px 20px;color:#fff;position:relative;overflow:hidden;background:var(--day,#2f8f83)}
+.ticket .top::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%);
+  transform:translateX(-100%);animation:shine 2.6s linear infinite}
+@keyframes shine{to{transform:translateX(100%)}}
+.ticket .brand{font:800 12px Unbounded;letter-spacing:.2em}
+.ticket .daycolor{font:700 12px Manrope;opacity:.92;margin-top:4px}
+.ticket .clock{position:absolute;right:18px;top:16px;text-align:right;font:800 20px Unbounded;font-variant-numeric:tabular-nums}
+.ticket .clock small{display:block;font:700 11px Manrope;opacity:.9;margin-top:2px}
+.ticket .mid{padding:20px 20px 8px;display:flex;align-items:center;gap:8px}
+.ticket .pct{font:800 76px/0.95 Unbounded;letter-spacing:-.05em}
+.ticket .for{font:700 14px Manrope;color:#6d5a44;margin-top:6px}
+.cup{position:relative;margin-left:auto;width:96px;height:124px}
+.cup img{position:absolute;bottom:0;left:0;width:100%}
+.cup i{position:absolute;bottom:104px;width:8px;height:34px;border-radius:8px;background:rgba(120,95,70,.35);filter:blur(4px);animation:steam 2.2s ease-in infinite}
+.cup i:nth-child(1){left:26px}.cup i:nth-child(2){left:46px;animation-delay:.7s}.cup i:nth-child(3){left:64px;animation-delay:1.3s}
+@keyframes steam{0%{transform:translateY(8px) scaleY(.6);opacity:0}30%{opacity:1}100%{transform:translateY(-34px) scaleX(1.8);opacity:0}}
+.ticket .cut{border-top:2px dashed #d9c8ad;margin:10px 20px 0;position:relative}
+.ticket .cut::before,.ticket .cut::after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:#12100d}
+.ticket .cut::before{left:-32px}.ticket .cut::after{right:-32px}
+.ticket .bot{padding:14px 20px 18px;font:500 12.5px/1.45 Manrope;color:#6d5a44}
+.ticket .bot b{color:#2b2016}
+.ticket .num{font:800 13px Unbounded;color:#2b2016;margin-bottom:6px}
+.hold{position:relative;display:block;width:100%;margin-top:14px;padding:15px;border-radius:14px;background:#2b2016;color:#fbf3e4;font:800 13px Manrope;overflow:hidden}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--teal)}
+.hold span{position:relative}
+.stamp{display:none;position:absolute;right:14px;bottom:86px;transform:rotate(-12deg);border:4px solid var(--red);color:var(--red);
+  font:800 17px Unbounded;padding:8px 12px;border-radius:12px;background:rgba(251,243,228,.85);text-align:center}
+.stamp small{display:block;font:700 10px Manrope}
+.ticket.used .stamp{display:block}
+.ticket.used .hold{display:none}
+.ticket.used .top{filter:grayscale(1)}
+.ticket.used .top::after{animation:none}
+#coupon .btn.ghost{max-width:360px}
+
+/* ---------- касса ---------- */
+#kassa{position:absolute;inset:0;z-index:30;display:none;background:#fbf3e4;color:#2b2016;padding:28px 22px;overflow:auto}
+#kassa.on{display:block}
+#kassa h2{font-size:20px;margin-bottom:6px}
+#kassa p{font-size:13px;color:#6d5a44;margin-bottom:16px;line-height:1.4}
+#kassa .row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e4d6bd;font:700 15px Manrope}
+#kassa .row i{width:44px;height:28px;border-radius:8px}
+#kassa .row.today{font-weight:800}
+#kassa .row.today::after{content:"сегодня";margin-left:auto;font:700 11px Manrope;color:#fff;background:#2b2016;padding:4px 9px;border-radius:99px}
+
+@media (prefers-reduced-motion:reduce){
+  .guest.hurry .inner,.timer.low,#hand,.ticket .top::after{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="view"><div id="tilt"><div id="world">
+    <img class="scene" id="scene" alt="Миниатюра кофейни Триста Бариста">
+    <div id="guests"></div>
+  </div></div></div>
+  <div id="flash"></div>
+
+  <div id="hud">
+    <div class="scorebox">
+      <div class="n"><span id="score">0</span><small>/ <span id="target"></span></small></div>
+      <div class="lbl" id="combo"></div>
+    </div>
+    <div class="prog" id="prog"><i id="bar"></i><em id="pctmark"></em></div>
+    <div class="timer" id="timer">60</div>
+    <button class="snd" id="snd" aria-label="Звук">🔊</button>
+  </div>
+
+  <div id="shelf"></div>
+  <div id="hand">👆</div>
+  <div id="hint">Тапни то, что хочет гость</div>
+  <div id="fx"></div>
+  <div id="toast"></div>
+
+  <section class="sheet" id="title">
+    <div class="eyebrow">Триста Бариста · мини-игра</div>
+    <h1>Час пик<br>в <b>Триста</b></h1>
+    <p>Гости заходят, а ты подаёшь заказы. Набери <b><span class="t-target"></span> очков</b> за <span class="t-dur"></span> секунд и забери <b>−<span class="t-disc"></span>%</b> в кофейне.</p>
+    <button class="btn" id="play">Играть</button>
+    <div class="credit" id="credit"></div>
+  </section>
+
+  <section class="sheet" id="end">
+    <div class="eyebrow" id="endEyebrow">Час пик окончен</div>
+    <div class="big"><span id="endScore">0</span> <small>очков</small></div>
+    <div id="endMsg"></div>
+    <div class="stats"><div><b id="stServed">0</b><span id="stServedLbl">гостей</span></div><div><b id="stCombo">0</b>лучшая серия</div><div><b id="stBest">0</b>рекорд</div></div>
+    <button class="btn" id="endMain">Ещё раз</button>
+    <button class="btn ghost" id="endAlt">Ещё раз</button>
+    <button class="btn ghost" id="share">Позвать друга: вдвоём каждому ещё −<span class="t-friend"></span>%</button>
+  </section>
+
+  <div id="coupon">
+    <div class="ticket" id="ticket">
+      <div class="top">
+        <div class="brand">ТРИСТА БАРИСТА</div>
+        <div class="daycolor" id="dayName"></div>
+        <div class="clock"><span id="clock">00:00:00</span><small id="cdate"></small></div>
+      </div>
+      <div class="mid">
+        <div><div class="pct">−<span class="t-disc"></span>%</div><div class="for" id="cfor"></div></div>
+        <div class="cup"><i></i><i></i><i></i><img src="assets/raf.webp" alt=""></div>
+      </div>
+      <div class="cut"></div>
+      <div class="bot">
+        <div class="num" id="cnum"></div>
+        Покажи этот экран бариста. <b>Пришли вдвоём и у обоих есть талон?</b> Каждому ещё −<span class="t-friend"></span>%.
+        <button class="hold" id="hold"><i></i><span>Бариста: удерживайте 2 секунды, чтобы погасить</span></button>
+      </div>
+      <div class="stamp">ИСПОЛЬЗОВАН<small id="usedAt"></small></div>
+    </div>
+    <button class="btn ghost" id="couponClose">Назад к игре</button>
+  </div>
+
+  <div id="pause"><div><h2>Пауза</h2><button class="btn" id="resume">Продолжить</button></div></div>
+
+  <div id="kassa">
+    <h2>Цвет талона по дням</h2>
+    <p>Памятка для кассы. Талон гостя должен быть «живым»: идут секунды, над чашкой пар. Цвет шапки совпадает с цветом дня. После скидки удерживайте кнопку «погасить» 2 секунды.</p>
+    <div id="kassaRows"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   НАСТРОЙКИ — всё, что можно менять без программиста
+   ============================================================ */
+const CONFIG = {
+  duration: 60,            // секунд на игру
+  target: 300,             // очков для скидки
+  discount: 10,            // % скидки
+  friendBonus: 5,          // % каждому, если пришли вдвоём
+  couponFor: 'на напиток или десерт',
+  oneCouponPerPhone: true, // один талон на телефон
+  points: { base: 4, speedMax: 3, comboStep: 6, comboMultMax: 2, timeout: -8, wrong: -5, pepper: -20 },
+  pace:   { spawnFrom: 2.3, spawnTo: 1.05, patienceFrom: 8.5, patienceTo: 4.8, maxFrom: 2, maxTo: 5 },
+  pepper: { startAt: 8, everyMin: 3.5, everyMax: 6.5, showFor: 1.9 },
+  dayHours: [9, 17],       // с 9 до 17 по Улан-Удэ — дневная сцена
+  tzOffset: 8,             // Улан-Удэ, UTC+8
+  voiceFiles: [],          // например ['assets/voice/ostro1.mp3'] — когда запишем голос
+  credit: 'Игра: @ariela_ra',
+  dayColors: [             // 0 = воскресенье
+    ['синий', '#2f6db5'], ['бирюзовый', '#2f8f83'], ['янтарный', '#c98a1e'], ['вишнёвый', '#a8324a'],
+    ['оливковый', '#6f8233'], ['лавандовый', '#7d66c2'], ['терракотовый', '#c4643a']
+  ],
+  dayNames: ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота']
+};
+const MENU = [
+  { id: 'raf',       name: 'Сырный раф' },
+  { id: 'macchiato', name: 'Медовый макиато' },
+  { id: 'cake',      name: 'Лимонный кекс' },
+  { id: 'sandwich',  name: 'Сэндвич' },
+  { id: 'donut',     name: 'Пончик' }
+];
+const GUEST_IMAGES = [1, 2, 3, 4, 5, 6].map(n => `assets/guest${n}.webp`);
+const SPOTS = [[455, 870], [690, 860], [925, 1000], [330, 1160], [850, 1185]]; // точки на картинке 1086×1448
+const SAY_SPICY = ['Ой, остро!', 'Ай, горячо!', 'Ой, перец!'];
+
+/* ============================================================ */
+const $ = s => document.querySelector(s);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp = (a, b, t) => a + (b - a) * t;
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('trista300.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('trista300.' + k, JSON.stringify(v)); } catch (e) {} }
+};
+const uuTime = () => new Date(Date.now() + CONFIG.tzOffset * 3600e3); // читать через getUTC*
+const pad = n => String(n).padStart(2, '0');
+
+const el = {
+  app: $('#app'), view: $('#view'), tilt: $('#tilt'), world: $('#world'), guests: $('#guests'), scene: $('#scene'),
+  hud: $('#hud'), shelf: $('#shelf'), fx: $('#fx'), flash: $('#flash'), toast: $('#toast'),
+  score: $('#score'), bar: $('#bar'), prog: $('#prog'), timer: $('#timer'), combo: $('#combo'),
+  title: $('#title'), end: $('#end'), coupon: $('#coupon'), hand: $('#hand'), hint: $('#hint'), pause: $('#pause')
+};
+
+/* ---------- тексты из настроек ---------- */
+document.querySelectorAll('.t-target').forEach(e => e.textContent = CONFIG.target);
+document.querySelectorAll('.t-dur').forEach(e => e.textContent = CONFIG.duration);
+document.querySelectorAll('.t-disc').forEach(e => e.textContent = CONFIG.discount);
+document.querySelectorAll('.t-friend').forEach(e => e.textContent = CONFIG.friendBonus);
+$('#target').textContent = CONFIG.target;
+$('#pctmark').textContent = '−' + CONFIG.discount + '%';
+$('#credit').textContent = CONFIG.credit;
+$('#cfor').textContent = CONFIG.couponFor;
+
+/* ---------- сцена: день или вечер по времени Улан-Удэ ---------- */
+(function () {
+  const q = new URLSearchParams(location.search).get('scene');
+  const h = uuTime().getUTCHours();
+  const day = q ? q === 'day' : (h >= CONFIG.dayHours[0] && h < CONFIG.dayHours[1]);
+  el.scene.src = day ? 'assets/scene-day.webp' : 'assets/scene-evening.webp';
+})();
+
+/* ============================================================
+   ЗВУК (всё синтезируется, файлов не нужно)
+   ============================================================ */
+const Snd = {
+  ctx: null, out: null, muted: store.get('muted', false), voices: [], clinkT: 0,
+  init() {
+    if (this.ctx) { this.ctx.resume && this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    this.ctx = new AC();
+    this.out = this.ctx.createGain(); this.out.gain.value = this.muted ? 0 : 1; this.out.connect(this.ctx.destination);
+    const n = this.ctx.sampleRate * 2, buf = this.ctx.createBuffer(1, n, this.ctx.sampleRate), d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = w; }
+    this.noiseBuf = buf;
+    // тихий гул кофейни
+    const brown = this.ctx.createBuffer(1, n, this.ctx.sampleRate), bd = brown.getChannelData(0); last = 0;
+    for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; bd[i] = last * 3.5; }
+    const src = this.ctx.createBufferSource(); src.buffer = brown; src.loop = true;
+    const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520;
+    const g = this.ctx.createGain(); g.gain.value = 0.05;
+    src.connect(lp); lp.connect(g); g.connect(this.out); src.start();
+    CONFIG.voiceFiles.forEach(u => fetch(u).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => this.ctx.decodeAudioData(b)).then(a => this.voices.push(a)).catch(() => {}));
+  },
+  setMuted(m) { this.muted = m; store.set('muted', m); if (this.out) this.out.gain.value = m ? 0 : 1; $('#snd').textContent = m ? '🔇' : '🔊'; },
+  tone(f, dur, o = {}) {
+    if (!this.ctx) return; const t = this.ctx.currentTime + (o.at || 0);
+    const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+    osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(f, t);
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(o.vol || 0.18, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g); g.connect(this.out); osc.start(t); osc.stop(t + dur + 0.05);
+  },
+  noise(dur, o = {}) {
+    if (!this.ctx) return; const t = this.ctx.currentTime + (o.at || 0);
+    const s = this.ctx.createBufferSource(); s.buffer = this.noiseBuf;
+    const f = this.ctx.createBiquadFilter(); f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 1200, t);
+    if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+    const g = this.ctx.createGain(); g.gain.setValueAtTime(o.vol || 0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(this.out); s.start(t); s.stop(t + dur + 0.05);
+  },
+  tap() { this.tone(620, 0.06, { vol: 0.12 }); },
+  whoosh() { this.noise(0.22, { f: 500, to: 2600, vol: 0.07 }); },
+  serve(combo) { const f = 784 * Math.pow(2, Math.min(combo, 12) / 12); this.tone(f, 0.22, { vol: 0.16 }); this.tone(f * 1.5, 0.3, { vol: 0.09, at: 0.05 }); },
+  wrong() { this.tone(150, 0.14, { type: 'square', vol: 0.06 }); },
+  miss() { this.tone(330, 0.3, { type: 'triangle', to: 150, vol: 0.12 }); },
+  spicy() {
+    this.noise(0.5, { type: 'highpass', f: 3500, vol: 0.14 }); this.tone(220, 0.25, { type: 'sawtooth', to: 660, vol: 0.07 });
+    if (this.voices.length) { const s = this.ctx.createBufferSource(); s.buffer = pick(this.voices); s.connect(this.out); s.start(); }
+  },
+  tick() { this.tone(1100, 0.04, { type: 'square', vol: 0.05 }); },
+  unlock() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.25, { at: i * 0.09, vol: 0.16 })); },
+  fin() { [392, 494, 587].forEach((f, i) => this.tone(f, 0.4, { at: i * 0.12, vol: 0.12, type: 'triangle' })); },
+  clink() { const f = rnd(2200, 3600); this.tone(f, 0.09, { vol: 0.02 }); this.tone(f * 1.48, 0.07, { vol: 0.012, at: 0.02 }); }
+};
+$('#snd').textContent = Snd.muted ? '🔇' : '🔊';
+$('#snd').addEventListener('click', () => { Snd.init(); Snd.setMuted(!Snd.muted); });
+
+/* ============================================================
+   КАМЕРА
+   ============================================================ */
+let camMode = 'title';
+function camFor(mode) {
+  const W = el.view.clientWidth, H = el.view.clientHeight;
+  if (mode === 'title') {
+    const free = H - el.title.offsetHeight + 40;
+    const s = Math.min(W / 1086, free / 1250) * 1.0;
+    return { s, tx: W / 2 - 543 * s, ty: Math.max(free / 2 - 700 * s, -80 * s) };
+  }
+  const top = el.hud.offsetHeight, bottom = el.shelf.offsetHeight, avail = H - top - bottom + 30;
+  const s = Math.min(W / 840, avail / 780);
+  return { s, tx: W / 2 - 600 * s, ty: top + avail / 2 - 850 * s };
+}
+function setCam(mode, ms = 0) {
+  camMode = mode; const c = camFor(mode);
+  el.world.style.transition = ms && !reduced ? `transform ${ms}ms cubic-bezier(.7,0,.2,1)` : 'none';
+  el.world.style.transform = `translate(${c.tx}px,${c.ty}px) scale(${c.s})`;
+}
+addEventListener('resize', () => setCam(camMode));
+
+/* ============================================================
+   ИГРА
+   ============================================================ */
+const G = { state: 'title', t: 0, score: 0, combo: 0, bestCombo: 0, served: 0, started: false, unlocked: false,
+            spawnT: 0, pepperT: 0, guests: [], paused: false, lastTick: -1, tutorial: true };
+const slots = [];
+
+MENU.forEach((m, i) => {
+  const b = document.createElement('button'); b.className = 'item';
+  b.innerHTML = `<div class="pic"><img src="assets/${m.id}.webp" alt=""></div><span>${m.name}</span>`;
+  b.addEventListener('pointerdown', e => { e.preventDefault(); tapSlot(i); });
+  el.shelf.appendChild(b);
+  slots.push({ btn: b, item: m, pepperLeft: 0 });
+});
+
+function setScore(v) {
+  G.score = Math.max(0, Math.round(v));
+  el.score.textContent = G.score;
+  el.bar.style.width = Math.min(G.score / CONFIG.target, 1) * 100 + '%';
+  el.prog.classList.toggle('done', G.score >= CONFIG.target);
+  if (G.score >= CONFIG.target && !G.unlocked) {
+    G.unlocked = true; Snd.unlock(); toast(`−${CONFIG.discount}% открыто! 🎉`);
+    if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
+  }
+}
+function mult() { const p = CONFIG.points; return Math.min(1 + Math.floor(G.combo / p.comboStep) * 0.5, p.comboMultMax); }
+function showCombo() { const m = mult(); el.combo.innerHTML = G.combo >= 2 ? `серия ${G.combo}${m > 1 ? ` · <b>×${m}</b>` : ''}` : ''; }
+
+function spawn() {
+  const free = SPOTS.map((s, i) => i).filter(i => !G.guests.some(g => g.spot === i));
+  if (!free.length) return;
+  const spot = pick(free);
+  const usedImg = G.guests.map(g => g.img);
+  const img = pick(GUEST_IMAGES.filter(u => !usedImg.includes(u)));
+  const wanted = G.guests.filter(g => g.state === 'wait').map(g => g.want.id);
+  let pool = MENU.filter(m => !wanted.includes(m.id)); if (!pool.length) pool = MENU;
+  const want = G.tutorial ? MENU[0] : pick(pool);
+  const p = Math.min(G.t / CONFIG.duration, 1);
+  const patience = lerp(CONFIG.pace.patienceFrom, CONFIG.pace.patienceTo, p);
+  const [x, y] = SPOTS[spot];
+  const node = document.createElement('div'); node.className = 'guest';
+  node.style.cssText = `left:${x}px;top:${y}px;z-index:${y}`;
+  node.innerHTML = `<div class="inner"><div class="bubble"><svg viewBox="0 0 158 158"><circle class="track" cx="79" cy="79" r="70"/><circle class="ring" cx="79" cy="79" r="70"/></svg><img src="assets/${want.id}.webp" alt="${want.name}"></div><img class="person" src="${img}" alt=""><div class="shadow"></div></div>`;
+  el.guests.appendChild(node);
+  const g = { node, inner: node.firstChild, bubble: node.querySelector('.bubble'), ring: node.querySelector('.ring'),
+              spot, img, want, left: patience, total: patience, state: 'wait' };
+  G.guests.push(g);
+  if (!reduced) {
+    g.inner.animate([{ transform: 'translateY(-70px) scale(.7,1.2)', opacity: 0 }, { transform: 'translateY(0) scale(1.12,.88)', opacity: 1, offset: .6 },
+      { transform: 'translateY(-10px) scale(.97,1.04)', offset: .8 }, { transform: 'none' }], { duration: 420, easing: 'ease-out' });
+    g.bubble.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.15)', offset: .7 }, { transform: 'scale(1)' }], { duration: 380, delay: 180, fill: 'backwards', easing: 'ease-out' });
+  }
+  if (G.tutorial) placeHand();
+}
+
+function removeGuest(g, delay) {
+  g.state = 'leave';
+  setTimeout(() => {
+    const a = g.node.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, fill: 'forwards' });
+    a.onfinish = () => { g.node.remove(); G.guests = G.guests.filter(x => x !== g); };
+  }, delay);
+}
+
+function centerOf(node) { const r = node.getBoundingClientRect(), a = el.app.getBoundingClientRect(); return [r.left - a.left + r.width / 2, r.top - a.top + r.height / 2]; }
+
+function fly(src, from, to, done) {
+  const img = document.createElement('img'); img.className = 'fly'; img.src = src; el.fx.appendChild(img);
+  const [x0, y0] = from, [x1, y1] = to, cx = (x0 + x1) / 2, cy = Math.min(y0, y1) - 110;
+  const frames = [];
+  for (let i = 0; i <= 10; i++) {
+    const t = i / 10, u = 1 - t;
+    const x = u * u * x0 + 2 * u * t * cx + t * t * x1, y = u * u * y0 + 2 * u * t * cy + t * t * y1;
+    frames.push({ transform: `translate(${x}px,${y}px) scale(${lerp(1.15, .55, t)}) rotate(${t * 200}deg)` });
+  }
+  const a = img.animate(frames, { duration: reduced ? 160 : 340, easing: 'cubic-bezier(.3,.1,.5,1)', fill: 'forwards' });
+  a.onfinish = () => { img.remove(); done && done(); };
+}
+function popText(text, pos, cls) {
+  const d = document.createElement('div'); d.className = 'pop ' + cls; d.textContent = text;
+  d.style.left = pos[0] + 'px'; d.style.top = pos[1] + 'px'; el.fx.appendChild(d);
+  d.animate([{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-90%) scale(1.15)', opacity: 1, offset: .25 },
+    { transform: 'translate(-50%,-240%) scale(1)', opacity: 0 }], { duration: 900, easing: 'ease-out' }).onfinish = () => d.remove();
+}
+function toast(text) {
+  el.toast.textContent = text;
+  el.toast.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.08)', offset: .15 },
+    { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: .8 }, { opacity: 0, transform: 'translate(-50%,-70%) scale(1)' }], { duration: 1700, easing: 'ease-out' });
+}
+function shake() {
+  if (reduced) return;
+  el.view.animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-9px,4px)' }, { transform: 'translate(8px,-5px)' }, { transform: 'translate(-6px,-3px)' },
+    { transform: 'translate(5px,4px)' }, { transform: 'translate(0,0)' }], { duration: 320 });
+}
+
+function tapSlot(i) {
+  if (G.state !== 'play' || G.paused) return;
+  Snd.init();
+  const s = slots[i];
+  if (s.pepperLeft > 0) return pepperHit(s);
+  const waiting = G.guests.filter(g => g.state === 'wait' && g.want.id === s.item.id).sort((a, b) => a.left - b.left);
+  if (!waiting.length) {
+    Snd.wrong(); s.btn.classList.remove('nope'); void s.btn.offsetWidth; s.btn.classList.add('nope');
+    if (!G.tutorial) { G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.wrong); popText(CONFIG.points.wrong, centerOf(s.btn), 'bad'); }
+    return;
+  }
+  const g = waiting[0]; g.state = 'served';
+  Snd.tap(); Snd.whoosh();
+  const frac = g.left / g.total;
+  G.combo++; G.bestCombo = Math.max(G.bestCombo, G.combo); G.served++;
+  const pts = Math.round((CONFIG.points.base + CONFIG.points.speedMax * frac) * mult());
+  if (G.tutorial) { G.tutorial = false; G.started = true; el.hand.style.display = el.hint.style.display = 'none'; G.spawnT = 0.5; }
+  fly(`assets/${s.item.id}.webp`, centerOf(s.btn.querySelector('img')), centerOf(g.bubble), () => {
+    Snd.serve(G.combo); setScore(G.score + pts); showCombo();
+    popText('+' + pts, centerOf(g.bubble), 'good');
+    g.node.classList.remove('hurry', 'warn');
+    g.bubble.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(0)' }], { duration: 300, fill: 'forwards' });
+    if (!reduced) g.inner.animate([{ transform: 'none' }, { transform: 'translateY(-34px) scale(.95,1.06)' }, { transform: 'none' }, { transform: 'translateY(-16px)' }, { transform: 'none' }], { duration: 520, easing: 'ease-out' });
+    removeGuest(g, 520);
+  });
+}
+
+function pepperHit(s) {
+  s.pepperLeft = 0; setPepper(s, false);
+  G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.pepper);
+  Snd.spicy(); shake(); if (navigator.vibrate) navigator.vibrate(70);
+  el.flash.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 0 }], { duration: 480 });
+  popText(CONFIG.points.pepper, centerOf(s.btn), 'bad');
+  const victim = G.guests.filter(g => g.state === 'wait').sort((a, b) => a.left - b.left)[0];
+  if (!victim) { toast(pick(SAY_SPICY) + ' 🌶️'); return; }
+  fly('assets/pepper.webp', centerOf(s.btn), centerOf(victim.bubble), () => {
+    const say = document.createElement('div'); say.className = 'say'; say.textContent = pick(SAY_SPICY);
+    victim.inner.appendChild(say); victim.node.classList.add('spicy');
+    if (!reduced) victim.inner.animate([{ transform: 'none' }, { transform: 'translateY(-46px) rotate(-6deg)' }, { transform: 'translateY(0) rotate(5deg)' }, { transform: 'translateY(-20px) rotate(-3deg)' }, { transform: 'none' }], { duration: 560 });
+    setTimeout(() => { say.remove(); victim.node.classList.remove('spicy'); }, 1100);
+  });
+}
+function setPepper(s, on) {
+  s.btn.classList.remove('flip'); void s.btn.offsetWidth; s.btn.classList.add('flip');
+  setTimeout(() => {
+    s.btn.classList.toggle('pepper', on);
+    s.btn.querySelector('img').src = on ? 'assets/pepper.webp' : `assets/${s.item.id}.webp`;
+    s.btn.querySelector('span').textContent = on ? 'Перчик?' : s.item.name;
+  }, 130);
+}
+
+function placeHand() {
+  const b = slots[0].btn.getBoundingClientRect(), a = el.app.getBoundingClientRect();
+  el.hand.style.cssText = `display:block;left:${b.left - a.left + b.width / 2 - 14}px;top:${b.top - a.top - 34}px`;
+  el.hint.style.display = 'block'; el.hint.style.top = (b.top - a.top - 84) + 'px';
+}
+
+/* ---------- цикл ---------- */
+let prev = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min((now - prev) / 1000, 0.1); prev = now;
+  if (Snd.ctx && !G.paused && (Snd.clinkT -= dt) <= 0) { Snd.clink(); Snd.clinkT = rnd(2.5, 7); }
+  if (G.state !== 'play' || G.paused) return;
+
+  if (G.started) {
+    G.t += dt;
+    const left = Math.max(0, CONFIG.duration - G.t), sec = Math.ceil(left);
+    el.timer.textContent = sec; el.timer.classList.toggle('low', sec <= 10);
+    if (sec <= 10 && sec !== G.lastTick && sec > 0) { G.lastTick = sec; Snd.tick(); }
+    if (left <= 0) return finish();
+
+    const p = Math.min(G.t / CONFIG.duration, 1), pc = CONFIG.pace;
+    const waiting = G.guests.filter(g => g.state === 'wait').length;
+    G.spawnT -= dt;
+    if ((G.spawnT <= 0 && waiting < Math.round(lerp(pc.maxFrom, pc.maxTo, p))) || (waiting === 0 && G.spawnT < lerp(pc.spawnFrom, pc.spawnTo, p) - 0.7)) {
+      spawn(); G.spawnT = lerp(pc.spawnFrom, pc.spawnTo, p) * rnd(0.8, 1.2);
+    }
+    // перчик на полке
+    G.pepperT -= dt;
+    if (G.t > CONFIG.pepper.startAt && G.pepperT <= 0 && !slots.some(s => s.pepperLeft > 0)) {
+      const s = pick(slots); s.pepperLeft = CONFIG.pepper.showFor; setPepper(s, true);
+      G.pepperT = rnd(CONFIG.pepper.everyMin, CONFIG.pepper.everyMax);
+    }
+    slots.forEach(s => { if (s.pepperLeft > 0 && (s.pepperLeft -= dt) <= 0) setPepper(s, false); });
+  }
+
+  for (const g of G.guests) {
+    if (g.state !== 'wait') continue;
+    if (G.started) g.left -= dt;
+    const f = Math.max(g.left / g.total, 0);
+    g.ring.style.strokeDashoffset = 440 * (1 - f);
+    g.node.classList.toggle('warn', f < 0.55 && f >= 0.28);
+    g.node.classList.toggle('hurry', f < 0.28);
+    if (g.left <= 0) {
+      G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.timeout); Snd.miss();
+      popText(CONFIG.points.timeout, centerOf(g.bubble), 'bad');
+      g.node.classList.remove('hurry');
+      g.bubble.animate([{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 200, fill: 'forwards' });
+      removeGuest(g, 150);
+    }
+  }
+}
+requestAnimationFrame(t => { prev = t; loop(t); });
+
+/* ---------- старт / финиш ---------- */
+function startGame(first) {
+  Object.assign(G, { state: 'play', t: 0, combo: 0, bestCombo: 0, served: 0, unlocked: false, started: !first, tutorial: first,
+                     spawnT: first ? 0 : 0.7, pepperT: rnd(1, 3), lastTick: -1, paused: false });
+  G.guests.forEach(g => g.node.remove()); G.guests = [];
+  slots.forEach(s => { if (s.btn.classList.contains('pepper')) setPepper(s, false); s.pepperLeft = 0; });
+  G.score = 0; setScore(0); showCombo();
+  el.timer.textContent = CONFIG.duration; el.timer.classList.remove('low');
+  el.title.classList.remove('on'); el.end.classList.remove('on');
+  el.hud.classList.add('on'); el.shelf.classList.add('on');
+  if (first) {
+    el.tilt.animate([{ transform: 'none' }, { transform: 'rotateX(7deg) scale(1.04)', offset: .5 }, { transform: 'none' }], { duration: reduced ? 0 : 1300, easing: 'ease-in-out' });
+    setTimeout(() => setCam('game', 1300), 30);
+    setTimeout(spawn, reduced ? 200 : 1350);
+  }
+}
+function finish() {
+  G.state = 'end'; Snd.fin();
+  el.hand.style.display = el.hint.style.display = 'none';
+  G.guests.forEach(g => g.state === 'wait' && removeGuest(g, 0));
+  slots.forEach(s => { if (s.pepperLeft > 0) { s.pepperLeft = 0; setPepper(s, false); } });
+  const best = Math.max(store.get('best', 0), G.score); store.set('best', best);
+  const won = G.score >= CONFIG.target, coupon = store.get('coupon', null);
+  $('#stServed').textContent = G.served; $('#stServedLbl').textContent = plural(G.served, 'гость', 'гостя', 'гостей'); $('#stCombo').textContent = G.bestCombo; $('#stBest').textContent = best;
+  const main = $('#endMain'), alt = $('#endAlt'), msg = $('#endMsg');
+  if (won || (coupon && !coupon.redeemedAt)) {
+    $('#endEyebrow').textContent = won ? 'Ты справилась с часом пик' : 'Час пик окончен';
+    msg.innerHTML = won ? `<div class="need">Скидка −${CONFIG.discount}% твоя 🎉</div>` : `<div class="need">Талон −${CONFIG.discount}% у тебя уже есть</div>`;
+    main.textContent = coupon ? 'Открыть талон' : 'Забрать талон'; main.onclick = openCoupon;
+    alt.style.display = ''; alt.onclick = () => startGame(false);
+    if (won) beans();
+  } else {
+    const need = CONFIG.target - G.score;
+    $('#endEyebrow').textContent = need <= 60 ? 'Совсем чуть-чуть!' : 'Час пик окончен';
+    msg.innerHTML = `<div class="need">Ещё ${need} ${plural(need, 'очко', 'очка', 'очков')} до −${CONFIG.discount}%</div>`;
+    main.textContent = 'Ещё раз'; main.onclick = () => startGame(false);
+    alt.style.display = 'none';
+  }
+  setTimeout(() => { el.shelf.classList.remove('on'); el.end.classList.add('on'); countUp($('#endScore'), G.score); }, 500);
+}
+function plural(n, a, b, c) { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; }
+function countUp(node, to) {
+  if (reduced) { node.textContent = to; return; }
+  const t0 = performance.now();
+  (function f(t) { const k = Math.min((t - t0) / 900, 1); node.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+function beans() {
+  if (reduced) return; const W = el.app.clientWidth, H = el.app.clientHeight;
+  for (let i = 0; i < 36; i++) {
+    const b = document.createElement('div'); b.className = 'bean'; b.style.left = rnd(0, W) + 'px'; el.fx.appendChild(b);
+    b.animate([{ transform: `translateY(0) rotate(0)` }, { transform: `translate(${rnd(-60, 60)}px,${H + 40}px) rotate(${rnd(-720, 720)}deg)` }],
+      { duration: rnd(1400, 2600), delay: rnd(0, 700), easing: 'cubic-bezier(.3,0,.8,1)' }).onfinish = () => b.remove();
+  }
+}
+
+$('#play').addEventListener('click', () => { Snd.init(); startGame(true); });
+$('#share').addEventListener('click', async () => {
+  const url = location.href.split('#')[0].split('?')[0];
+  const text = `Я набрала ${G.score} очков в «Час пик в Триста». Сыграй и приходи со мной: вдвоём каждому ещё −${CONFIG.friendBonus}% ☕`;
+  try { if (navigator.share) await navigator.share({ title: 'Час пик в Триста', text, url }); else { await navigator.clipboard.writeText(text + ' ' + url); toast('Ссылка скопирована'); } } catch (e) {}
+});
+
+/* ---------- пауза при уходе со вкладки ---------- */
+document.addEventListener('visibilitychange', () => { if (document.hidden && G.state === 'play' && G.started) { G.paused = true; el.pause.classList.add('on'); } });
+$('#resume').addEventListener('click', () => { G.paused = false; el.pause.classList.remove('on'); });
+
+/* ============================================================
+   ТАЛОН
+   ============================================================ */
+let clockInt = 0;
+function openCoupon() {
+  let c = store.get('coupon', null);
+  if (!c) { c = { id: '300-' + Math.floor(1000 + Math.random() * 9000), issuedAt: Date.now(), redeemedAt: 0 }; store.set('coupon', c); }
+  $('#cnum').textContent = 'Талон № ' + c.id;
+  renderCoupon(c); el.coupon.classList.add('on');
+  clearInterval(clockInt); clockInt = setInterval(() => renderCoupon(store.get('coupon', c)), 250);
+}
+function renderCoupon(c) {
+  const d = uuTime(), [name, color] = CONFIG.dayColors[d.getUTCDay()];
+  $('#clock').textContent = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  $('#cdate').textContent = `${pad(d.getUTCDate())}.${pad(d.getUTCMonth() + 1)} · Улан-Удэ`;
+  $('#dayName').textContent = `Цвет дня: ${name}`;
+  $('#ticket').style.setProperty('--day', color);
+  $('#ticket').classList.toggle('used', !!c.redeemedAt);
+  if (c.redeemedAt) { const u = new Date(c.redeemedAt + CONFIG.tzOffset * 3600e3); $('#usedAt').textContent = `${pad(u.getUTCDate())}.${pad(u.getUTCMonth() + 1)} в ${pad(u.getUTCHours())}:${pad(u.getUTCMinutes())}`; }
+}
+$('#couponClose').addEventListener('click', () => { el.coupon.classList.remove('on'); clearInterval(clockInt); });
+(function () {
+  const hold = $('#hold'), fill = hold.querySelector('i'); let raf = 0, t0 = 0;
+  const stop = () => { cancelAnimationFrame(raf); fill.style.width = '0'; };
+  hold.addEventListener('pointerdown', e => {
+    e.preventDefault(); t0 = performance.now();
+    (function f(t) {
+      const k = Math.min((t - t0) / 2000, 1); fill.style.width = k * 100 + '%';
+      if (k >= 1) { const c = store.get('coupon', null); if (c) { c.redeemedAt = Date.now(); store.set('coupon', c); renderCoupon(c); } if (navigator.vibrate) navigator.vibrate(120); return; }
+      raf = requestAnimationFrame(f);
+    })(t0);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hold.addEventListener(ev, stop));
+})();
+
+/* ---------- памятка для кассы: открыть ссылку с #kassa ---------- */
+(function () {
+  const today = uuTime().getUTCDay();
+  $('#kassaRows').innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => `<div class="row${d === today ? ' today' : ''}"><i style="background:${CONFIG.dayColors[d][1]}"></i>${CONFIG.dayNames[d]} — ${CONFIG.dayColors[d][0]}</div>`).join('');
+  const sync = () => $('#kassa').classList.toggle('on', location.hash === '#kassa');
+  addEventListener('hashchange', sync); sync();
+})();
+
+/* ---------- заставка ---------- */
+function intro() {
+  setCam('title');
+  if (!reduced) el.tilt.animate([{ transform: 'rotateX(38deg) scale(.72) translateY(60px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 1400, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  setTimeout(() => { el.title.classList.add('on'); }, reduced ? 0 : 500);
+  setTimeout(() => setCam('title', 700), 1150);
+}
+if (el.scene.complete) intro(); else el.scene.addEventListener('load', intro);
+if (new URLSearchParams(location.search).has('coupon')) openCoupon(); // для показа кофейне
+</script>
+</body>
+</html>
