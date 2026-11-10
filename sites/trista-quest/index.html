@@ -280,7 +280,7 @@ const CONFIG = {
     rushLast: 15, rushPace: 0.75                                               // финальный рывок
   },
   pepper: { startAt: 4, everyMin: 2.8, everyMax: 5.5, showFor: 1.9, twoFrom: 25 }, // ловушки на полке; с twoFrom секунд их может быть две сразу
-  speak: true,             // озвучивать «Ой, остро!» голосом телефона (пока нет своей записи)
+  speak: false,            // озвучивать «Ой, остро!» голосом телефона (пока нет своей записи)
   dayHours: [9, 17],       // с 9 до 17 по Улан-Удэ — дневная сцена
   tzOffset: 8,             // Улан-Удэ, UTC+8
   voiceFiles: [],          // например ['assets/voice/ostro1.mp3'] — когда запишем голос
@@ -401,6 +401,7 @@ const Snd = {
   spicy() {
     this.noise(0.5, { type: 'highpass', f: 3500, vol: 0.14 }); this.tone(220, 0.25, { type: 'sawtooth', to: 660, vol: 0.07 });
     if (this.voices.length) { const s = this.ctx.createBufferSource(); s.buffer = pick(this.voices); s.connect(this.out); s.start(); }
+    else { this.tone(700, 0.11, { to: 1500, vol: 0.2 }); this.tone(1500, 0.2, { to: 900, vol: 0.2, at: 0.12 }); } // мультяшное «ой!»
   },
   tick() { this.tone(1100, 0.04, { type: 'square', vol: 0.05 }); },
   unlock() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.25, { at: i * 0.09, vol: 0.16 })); },
