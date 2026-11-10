@@ -278,8 +278,8 @@ const CONFIG = {
   hard: {                  // сложности
     doubleFrom: 4, doubleChance: 0.3, doublePatience: 1.45, doubleBonus: 4,   // двойные заказы
     vipFrom: 8, vipChance: 0.15, vipPatience: 0.6, vipMult: 2,                // золотой гость
-    shuffleAt: [12, 24, 33],                                                       // когда переставляется полка
-    expandAt: 20,                                                              // когда в меню появляются новинки
+    shuffleAt: [10, 21, 33],                                                       // когда переставляется полка
+    expandAt: [15, 27],                                                             // когда в меню появляются новинки
     rushLast: 10, rushPace: 0.75                                               // финальный рывок
   },
   pepper: { startAt: 3, everyMin: 2.5, everyMax: 5, showFor: 1.9, twoFrom: 16 }, // ловушки на полке; с twoFrom секунд их может быть две сразу
@@ -308,9 +308,9 @@ const TRAPS = [
   { id: 'pepper', img: 'assets/pepper.webp', label: 'Перчик?',   say: ['Ой, остро!', 'Ай, горячо!', 'Ой, перец!'], flash: 'rgba(226,70,40,.6)' },
   { id: 'garlic', img: emojiImg('🧄'),       label: 'Чесночок?', say: ['Фу, чеснок!', 'Ой, чеснок!', 'Фу-у-у!'],   flash: 'rgba(150,170,60,.6)' }
 ];
-const EXTRA = [              // новинки, которые появляются в середине игры (пока эмодзи вместо картинок)
-  { id: 'popcorn',   name: 'Латте попкорн',  img: emojiImg('🍿') },   // Латте «Карамельный попкорн» из меню кофейни
-  { id: 'bumble',    name: 'Бамбл апельсин', img: emojiImg('🍊') }    // Бамбл «Апельсин» из меню кофейни
+const EXTRA = [              // новинки: каждая группа появляется в свой момент (CONFIG.hard.expandAt)
+  [{ id: 'omelet', name: 'Омлет с лососем' }, { id: 'syrniki', name: 'Сырники' }, { id: 'caesar', name: 'Цезарь' }],
+  [{ id: 'carbonara', name: 'Карбонара' }, { id: 'eggs', name: 'Глазунья' }]
 ];
 const srcOf = m => m.img || `assets/${m.id}.webp`;
 let ACTIVE = MENU.slice();
@@ -445,7 +445,7 @@ addEventListener('resize', () => setCam(camMode));
 /* ============================================================
    ИГРА
    ============================================================ */
-const G = { state: 'title', t: 0, score: 0, combo: 0, bestCombo: 0, served: 0, started: false, unlocked: false,
+const G = { wave: 0, state: 'title', t: 0, score: 0, combo: 0, bestCombo: 0, served: 0, started: false, unlocked: false,
             spawnT: 0, pepperT: 0, guests: [], paused: false, lastTick: -1, tutorial: true };
 const slots = [];
 
@@ -459,8 +459,8 @@ function addSlot(m) {
 }
 MENU.forEach(addSlot);
 function expandMenu() {
-  G.expanded = true; ACTIVE = MENU.concat(EXTRA);
-  EXTRA.forEach((m, k) => {
+  const add = EXTRA[G.wave++]; ACTIVE = ACTIVE.concat(add);
+  add.forEach((m, k) => {
     const b = addSlot(m); b.classList.add('fresh');
     if (!reduced) b.animate([{ transform: 'translateY(60px) scale(.5)', opacity: 0 }, { transform: 'translateY(-8px) scale(1.1)', opacity: 1, offset: .7 }, { transform: 'none' }], { duration: 420, delay: k * 120, fill: 'backwards', easing: 'ease-out' });
   });
@@ -660,7 +660,7 @@ function loop(now) {
       spawn(); G.spawnT = lerp(pc.spawnFrom, pc.spawnTo, p) * rnd(0.8, 1.2) * (G.rush ? CONFIG.hard.rushPace : 1);
     }
     const H = CONFIG.hard;
-    if (!G.expanded && G.t >= H.expandAt) expandMenu();
+    if (G.wave < EXTRA.length && G.t >= H.expandAt[G.wave]) expandMenu();
     if (G.shuffleI < H.shuffleAt.length && G.t >= H.shuffleAt[G.shuffleI]) { G.shuffleI++; shuffleShelf(); }
     if (!G.rush && G.t >= CONFIG.duration - H.rushLast) { G.rush = true; toast('Час пик! 🔥'); [440, 554, 659].forEach((f, i) => Snd.tone(f, 0.14, { at: i * 0.08, type: 'square', vol: 0.06 })); }
     // перчик на полке
@@ -695,7 +695,7 @@ requestAnimationFrame(t => { prev = t; loop(t); });
 /* ---------- старт / финиш ---------- */
 function startGame(first) {
   Object.assign(G, { state: 'play', t: 0, combo: 0, bestCombo: 0, served: 0, unlocked: false, started: !first, tutorial: first,
-                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, expanded: false, missed: 0, traps: 0, pepperT: rnd(1, 3), lastTick: -1, paused: false });
+                     spawnT: first ? 0 : 0.7, shuffleI: 0, rush: false, wave: 0, missed: 0, traps: 0, pepperT: rnd(1, 3), lastTick: -1, paused: false });
   G.guests.forEach(g => g.node.remove()); G.guests = []; resetMenu();
   slots.forEach(s => { if (s.trap) setPepper(s, false); s.pepperLeft = 0; });
   G.score = 0; setScore(0); showCombo();
