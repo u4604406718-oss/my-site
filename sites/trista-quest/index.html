@@ -165,6 +165,8 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
 .ticket .bot{padding:14px 20px 18px;font:500 12.5px/1.45 Manrope;color:#6d5a44}
 .ticket .bot b{color:#2b2016}
 .ticket .num{font:800 13px Unbounded;color:#2b2016;margin-bottom:6px}
+.demo{display:none;margin:0 20px 10px;padding:9px 12px;border-radius:12px;background:#2b2016;color:#ffd98a;font:800 12px Manrope;text-align:center}
+body.is-demo .demo{display:block}
 .hold{position:relative;display:block;width:100%;margin-top:14px;padding:15px;border-radius:14px;background:#2b2016;color:#fbf3e4;font:800 13px Manrope;overflow:hidden}
 .hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--teal)}
 .hold span{position:relative}
@@ -245,6 +247,7 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
         <div><div class="pct">−<span class="t-disc"></span>%</div><div class="for" id="cfor"></div></div>
         <div class="cup"><i></i><i></i><i></i><img src="assets/raf.webp" alt=""></div>
       </div>
+      <div class="demo">ДЕМО-ВЕРСИЯ · скидка пока не действует</div>
       <div class="cut"></div>
       <div class="bot">
         <div class="num" id="cnum"></div>
@@ -276,6 +279,7 @@ const CONFIG = {
   friendBonus: 5,          // % каждому, если пришли вдвоём
   couponFor: 'на напиток или десерт',
   lives: 3,                // сердечек: нажала не ту кнопку или ловушку — одно трескается
+  demo: true,              // пока кофейня не согласовала акцию: на талоне пометка «скидка пока не действует»
   oneCouponPerPhone: true, // один талон на телефон
   points: { base: 4, speedMax: 4, comboStep: 6, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
   pace:   { spawnFrom: 2.1, spawnTo: 1.45, patienceFrom: 9, patienceTo: 6.8, maxFrom: 2, maxTo: 4 },
@@ -356,6 +360,7 @@ $('#target').textContent = CONFIG.target;
 $('#pctmark').textContent = '−' + CONFIG.discount + '%';
 $('#credit').textContent = CONFIG.credit;
 $('#cfor').textContent = CONFIG.couponFor;
+document.body.classList.toggle('is-demo', CONFIG.demo);
 
 /* ---------- сцена: день или вечер по времени Улан-Удэ ---------- */
 (function () {
