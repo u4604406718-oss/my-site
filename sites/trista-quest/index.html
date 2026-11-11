@@ -67,6 +67,9 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
 .scorebox .lbl b{color:var(--amber)}
 .prog{flex:1;position:relative;height:12px;border-radius:99px;background:rgba(246,236,220,.12)}
 .prog i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--amber));transition:width .35s cubic-bezier(.2,.8,.2,1)}
+#lives{position:absolute;left:0;top:17px;display:flex;gap:4px;font-size:15px;line-height:1}
+#lives span{display:inline-block;transition:opacity .4s,filter .4s}
+#lives span.lost{opacity:.28;filter:grayscale(1)}
 .prog em{position:absolute;right:-2px;top:-22px;font:800 11px Unbounded;font-style:normal;color:var(--amber)}
 .prog.done i{background:linear-gradient(90deg,var(--amber),#ffd98a);box-shadow:0 0 14px rgba(234,169,63,.7)}
 .timer{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:800 17px Unbounded;font-variant-numeric:tabular-nums;
@@ -202,7 +205,7 @@ h1,h2,.display{font-family:Unbounded,Manrope,sans-serif}
       <div class="n"><span id="score">0</span><small>/ <span id="target"></span></small></div>
       <div class="lbl" id="combo"></div>
     </div>
-    <div class="prog" id="prog"><i id="bar"></i><em id="pctmark"></em></div>
+    <div class="prog" id="prog"><i id="bar"></i><em id="pctmark"></em><div id="lives"></div></div>
     <div class="timer" id="timer">40</div>
     <button class="snd" id="snd" aria-label="Звук">🔊</button>
   </div>
@@ -272,6 +275,7 @@ const CONFIG = {
   discount: 10,            // % скидки
   friendBonus: 5,          // % каждому, если пришли вдвоём
   couponFor: 'на напиток или десерт',
+  lives: 3,                // сердечек: нажала не ту кнопку или ловушку — одно трескается
   oneCouponPerPhone: true, // один талон на телефон
   points: { base: 4, speedMax: 4, comboStep: 6, comboMultMax: 2, timeout: -4, wrong: -3, pepper: -12 },
   pace:   { spawnFrom: 2.1, spawnTo: 1.45, patienceFrom: 9, patienceTo: 6.8, maxFrom: 2, maxTo: 4 },
@@ -481,6 +485,21 @@ function setScore(v) {
     if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
   }
 }
+function renderLives() {
+  $('#lives').innerHTML = Array.from({ length: CONFIG.lives }, (_, i) => `<span class="${i < G.lives ? '' : 'lost'}">${i < G.lives ? '❤️' : '💔'}</span>`).join('');
+}
+function loseLife() {
+  if (G.state !== 'play' || G.tutorial || G.lives <= 0) return;
+  G.lives--;
+  const h = $('#lives').children[G.lives];
+  if (h) {
+    h.textContent = '💔';
+    h.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.9) rotate(-14deg)' }, { transform: 'scale(1.3) rotate(10deg)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'ease-out' })
+      .onfinish = () => h.classList.add('lost');
+  }
+  Snd.tone(300, 0.18, { type: 'triangle', to: 120, vol: 0.14 });
+  if (G.lives <= 0) setTimeout(() => G.state === 'play' && finish('lives'), 650);
+}
 function mult() { const p = CONFIG.points; return Math.min(1 + Math.floor(G.combo / p.comboStep) * 0.5, p.comboMultMax); }
 function showCombo() { const m = mult(); el.combo.innerHTML = G.combo >= 2 ? `серия ${G.combo}${m > 1 ? ` · <b>×${m}</b>` : ''}` : ''; }
 
@@ -566,7 +585,7 @@ function tapSlot(i) {
   const waiting = G.guests.filter(g => g.state === 'wait' && g.need.includes(id)).sort((a, b) => a.left - b.left);
   if (!waiting.length) {
     Snd.wrong(); s.btn.classList.remove('nope'); void s.btn.offsetWidth; s.btn.classList.add('nope');
-    if (!G.tutorial) { G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.wrong); popText(CONFIG.points.wrong, centerOf(s.btn), 'bad'); }
+    if (!G.tutorial) { G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.wrong); popText(CONFIG.points.wrong, centerOf(s.btn), 'bad'); loseLife(); }
     return;
   }
   const g = waiting[0]; g.need.splice(g.need.indexOf(id), 1);
@@ -606,7 +625,7 @@ function shuffleShelf() {
 function pepperHit(s) {
   const trap = s.trap || TRAPS[0], text = pick(trap.say);
   s.pepperLeft = 0; setPepper(s, false);
-  G.traps++; G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.pepper);
+  G.traps++; G.combo = 0; showCombo(); setScore(G.score + CONFIG.points.pepper); loseLife();
   Snd.spicy(); speak(text); shake(); if (navigator.vibrate) navigator.vibrate(70);
   el.flash.style.background = `radial-gradient(circle at 50% 55%,transparent 30%,${trap.flash})`;
   el.flash.animate([{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: 0 }], { duration: 480 });
@@ -699,7 +718,7 @@ function startGame(first) {
   G.guests.forEach(g => g.node.remove()); G.guests = []; resetMenu();
   slots.forEach(s => { if (s.trap) setPepper(s, false); s.pepperLeft = 0; });
   G.score = 0; setScore(0); showCombo();
-  el.timer.textContent = CONFIG.duration; el.timer.classList.remove('low');
+  el.timer.textContent = CONFIG.duration; el.timer.classList.remove('low'); G.lives = CONFIG.lives; renderLives();
   el.title.classList.remove('on'); el.end.classList.remove('on');
   el.hud.classList.add('on'); el.shelf.classList.add('on');
   if (first) {
@@ -708,7 +727,7 @@ function startGame(first) {
     setTimeout(spawn, reduced ? 200 : 1350);
   }
 }
-function finish() {
+function finish(reason) {
   G.state = 'end'; Snd.fin();
   el.hand.style.display = el.hint.style.display = 'none';
   G.guests.forEach(g => g.state === 'wait' && removeGuest(g, 0));
@@ -725,7 +744,7 @@ function finish() {
     if (won) beans();
   } else {
     const need = CONFIG.target - G.score;
-    $('#endEyebrow').textContent = need <= 60 ? 'Совсем чуть-чуть!' : 'Час пик окончен';
+    $('#endEyebrow').textContent = reason === 'lives' ? 'Сердечки закончились 💔' : need <= 60 ? 'Совсем чуть-чуть!' : 'Час пик окончен';
     msg.innerHTML = `<div class="need">Ещё ${need} ${plural(need, 'очко', 'очка', 'очков')} до −${CONFIG.discount}%</div>`;
     main.textContent = 'Ещё раз'; main.onclick = () => startGame(false);
     alt.style.display = 'none';
